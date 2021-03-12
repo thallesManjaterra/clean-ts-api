@@ -1,7 +1,4 @@
-import { AccountModel } from '../../../domain/models/account'
-import { AddAccountModel } from '../../../domain/usecases/add-account'
-import { AddAccountRepository } from '../../protocols/add-account-repository'
-import { Encrypter } from '../../protocols/encrypter'
+import { Encrypter, AddAccountRepository, AddAccountModel, AccountModel } from './db-add-account-protocols'
 import { DbAddAccount } from './db-add-account'
 
 describe('DbAddAccount Usecase', () => {
