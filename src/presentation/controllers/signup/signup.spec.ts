@@ -1,3 +1,4 @@
+import { InvalidParamError } from '../../errors/Invalid-param-error'
 import { MissingParamError } from '../../errors/missing-param-error'
 import { badRequest } from '../../helpers/http-helper'
 import { SignUpController } from './signup'
@@ -62,6 +63,6 @@ describe('Sign Up Controller', () => {
       }
     }
     const httpResponse = sut.handle(httpRequest)
-    expect(httpResponse).toEqual(badRequest(new Error('Invalid param: password')))
+    expect(httpResponse).toEqual(badRequest(new InvalidParamError('password')))
   })
 })
