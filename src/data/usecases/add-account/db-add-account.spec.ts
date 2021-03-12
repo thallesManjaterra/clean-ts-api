@@ -1,4 +1,6 @@
+import { AccountModel } from '../../../domain/models/account'
 import { AddAccountModel } from '../../../domain/usecases/add-account'
+import { AddAccountRepository } from '../../protocols/add-account-repository'
 import { Encrypter } from '../../protocols/encrypter'
 import { DbAddAccount } from './db-add-account'
 
@@ -15,8 +17,22 @@ describe('DbAddAccount Usecase', () => {
     jest
       .spyOn(encrypterStub, 'encrypt')
       .mockRejectedValueOnce(new Error())
+    const promise = sut.add(makeFakeAccountData())
+    await expect(promise).rejects.toThrow()
+  })
+  test('should call AddAccountRepository with correct values', async () => {
+    const { sut, addAccountRepositoryStub } = makeSut()
+    const addSpy = jest.spyOn(addAccountRepositoryStub, 'add')
     const accountData = makeFakeAccountData()
-    const promise = sut.add(accountData)
+    await sut.add(accountData)
+    expect(addSpy).toHaveBeenCalledWith({ ...accountData, password: makeFakeHash() })
+  })
+  test('should throw if AddAccountRepository throws', async () => {
+    const { sut, addAccountRepositoryStub } = makeSut()
+    jest
+      .spyOn(addAccountRepositoryStub, 'add')
+      .mockRejectedValueOnce(new Error())
+    const promise = sut.add(makeFakeAccountData())
     await expect(promise).rejects.toThrow()
   })
 })
@@ -24,21 +40,45 @@ describe('DbAddAccount Usecase', () => {
 interface SutTypes {
   sut: DbAddAccount
   encrypterStub: Encrypter
+  addAccountRepositoryStub: AddAccountRepository
 }
 
 function makeSut (): SutTypes {
   const encrypterStub = makeEncrypter()
-  const sut = new DbAddAccount(encrypterStub)
-  return { sut, encrypterStub }
+  const addAccountRepositoryStub = makeAddAccountRepository()
+  const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub)
+  return { sut, encrypterStub, addAccountRepositoryStub }
 }
 
 function makeEncrypter (): Encrypter {
   class EncrypterStub implements Encrypter {
     async encrypt (_value: string): Promise<string> {
-      return await Promise.resolve('hashed_value')
+      return await Promise.resolve(makeFakeHash())
     }
   }
   return new EncrypterStub()
+}
+
+function makeFakeHash (): string {
+  return 'any_hash'
+}
+
+function makeAddAccountRepository (): AddAccountRepository {
+  class AddAccountRepositoryStub implements AddAccountRepository {
+    async add (accountData: AddAccountModel): Promise<AccountModel> {
+      return await Promise.resolve(makeFakeAccount())
+    }
+  }
+  return new AddAccountRepositoryStub()
+}
+
+function makeFakeAccount (): AccountModel {
+  return {
+    id: 'any_id',
+    name: 'any_name',
+    email: 'any_email@mail.com',
+    password: makeFakeHash()
+  }
 }
 
 function makeFakeAccountData (): AddAccountModel {
