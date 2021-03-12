@@ -11,5 +11,8 @@ export class SignUpController implements Controller {
         return badRequest(new MissingParamError(field))
       }
     }
+    if (httpRequest.body.password !== httpRequest.body.passwordConfirmation) {
+      return badRequest(new Error('Invalid param: password'))
+    }
   }
 }
