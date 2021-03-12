@@ -149,4 +149,12 @@ describe('Sign Up Controller', () => {
     const { name, email, password } = httpRequest.body
     expect(addAccountSpy).toHaveBeenCalledWith({ name, email, password })
   })
+  test('should return 500 if AddAccount throws', async () => {
+    const { sut, addAccountStub } = makeSut()
+    jest
+      .spyOn(addAccountStub, 'add')
+      .mockRejectedValueOnce(new Error())
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(serverError())
+  })
 })
