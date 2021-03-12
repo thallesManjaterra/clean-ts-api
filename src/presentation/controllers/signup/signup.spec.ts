@@ -26,12 +26,13 @@ function makeEmailValidator (): EmailValidator {
 function makeAddAccount (): AddAccount {
   class AddAccountStub implements AddAccount {
     async add (accountData: AddAccountModel): Promise<AccountModel> {
-      return {
+      const fakeAccount = {
         id: 'any_id',
         name: 'any_name',
         email: 'any_email@mail.com',
         password: 'hashed_password'
       }
+      return await Promise.resolve(fakeAccount)
     }
   }
   return new AddAccountStub()
@@ -156,5 +157,18 @@ describe('Sign Up Controller', () => {
       .mockRejectedValueOnce(new Error())
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(serverError())
+  })
+  test('should return 200 on success', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual({
+      statusCode: 200,
+      body: {
+        id: 'any_id',
+        name: 'any_name',
+        email: 'any_email@mail.com',
+        password: 'hashed_password'
+      }
+    })
   })
 })
