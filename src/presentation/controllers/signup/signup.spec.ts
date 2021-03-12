@@ -2,7 +2,19 @@ import { InvalidParamError } from '../../errors/Invalid-param-error'
 import { MissingParamError } from '../../errors/missing-param-error'
 import { badRequest } from '../../helpers/http-helper'
 import { EmailValidator } from '../../protocols/email-validator'
+import { HttpRequest } from '../../protocols/http'
 import { SignUpController } from './signup'
+
+function makeFakeRequest (): HttpRequest {
+  return {
+    body: {
+      name: 'any_name',
+      email: 'any_email@mail.com',
+      password: 'any_password',
+      passwordConfirmation: 'any_password'
+    }
+  }
+}
 
 function makeEmailValidator (): EmailValidator {
   class EmailValidatorStub implements EmailValidator {
@@ -103,15 +115,19 @@ describe('Sign Up Controller', () => {
   test('should return call EmailValidator with correct email', () => {
     const { sut, emailValidatorStub } = makeSut()
     const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'valid_email@mail.com',
-        password: 'any_password',
-        passwordConfirmation: 'any_password'
-      }
-    }
+    const httpRequest = makeFakeRequest()
     sut.handle(httpRequest)
     expect(isValidSpy).toHaveBeenCalledWith(httpRequest.body.email)
+  })
+  test('should return 500 if EmailValidator throws', () => {
+    const { sut, emailValidatorStub } = makeSut()
+    jest
+      .spyOn(emailValidatorStub, 'isValid')
+      .mockImplementationOnce(() => { throw new Error() })
+    const httpResponse = sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual({
+      statusCode: 500,
+      body: new Error('Internal server error')
+    })
   })
 })
