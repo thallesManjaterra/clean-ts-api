@@ -1,8 +1,7 @@
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { badRequest, serverError } from '../../helpers/http-helper'
-import { EmailValidator } from '../../protocols/email-validator'
-import { HttpRequest } from '../../protocols/http'
 import { SignUpController } from './signup'
+import { HttpRequest, EmailValidator } from './signup-protocols'
 
 function makeFakeRequest (): HttpRequest {
   return {
