@@ -4,18 +4,22 @@ import { badRequest } from '../../helpers/http-helper'
 import { EmailValidator } from '../../protocols/email-validator'
 import { SignUpController } from './signup'
 
+function makeEmailValidator (): EmailValidator {
+  class EmailValidatorStub implements EmailValidator {
+    isValid (_email: string): boolean {
+      return true
+    }
+  }
+  return new EmailValidatorStub()
+}
+
 interface SutTypes {
   sut: SignUpController
   emailValidatorStub: EmailValidator
 }
 
 function makeSut (): SutTypes {
-  class EmailValidatorStub implements EmailValidator {
-    isValid (_email: string): boolean {
-      return true
-    }
-  }
-  const emailValidatorStub = new EmailValidatorStub()
+  const emailValidatorStub = makeEmailValidator()
   const sut = new SignUpController(emailValidatorStub)
   return { sut, emailValidatorStub }
 }
