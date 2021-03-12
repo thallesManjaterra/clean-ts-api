@@ -3,57 +3,6 @@ import { badRequest, ok, serverError } from '../../helpers/http-helper'
 import { SignUpController } from './signup'
 import { HttpRequest, EmailValidator, AddAccount, AddAccountModel, AccountModel } from './signup-protocols'
 
-function makeFakeRequest (): HttpRequest {
-  return {
-    body: {
-      name: 'any_name',
-      email: 'any_email@mail.com',
-      password: 'any_password',
-      passwordConfirmation: 'any_password'
-    }
-  }
-}
-
-function makeEmailValidator (): EmailValidator {
-  class EmailValidatorStub implements EmailValidator {
-    isValid (_email: string): boolean {
-      return true
-    }
-  }
-  return new EmailValidatorStub()
-}
-
-function makeFakeAccount (): AccountModel {
-  return {
-    id: 'any_id',
-    name: 'any_name',
-    email: 'any_email@mail.com',
-    password: 'hashed_password'
-  }
-}
-
-function makeAddAccount (): AddAccount {
-  class AddAccountStub implements AddAccount {
-    async add (accountData: AddAccountModel): Promise<AccountModel> {
-      return await Promise.resolve(makeFakeAccount())
-    }
-  }
-  return new AddAccountStub()
-}
-
-interface SutTypes {
-  sut: SignUpController
-  emailValidatorStub: EmailValidator
-  addAccountStub: AddAccount
-}
-
-function makeSut (): SutTypes {
-  const emailValidatorStub = makeEmailValidator()
-  const addAccountStub = makeAddAccount()
-  const sut = new SignUpController(emailValidatorStub, addAccountStub)
-  return { sut, emailValidatorStub, addAccountStub }
-}
-
 describe('Sign Up Controller', () => {
   test('should return 400 if no name is provided', async () => {
     const { sut } = makeSut()
@@ -167,3 +116,54 @@ describe('Sign Up Controller', () => {
     expect(httpResponse).toEqual(ok(makeFakeAccount()))
   })
 })
+
+interface SutTypes {
+  sut: SignUpController
+  emailValidatorStub: EmailValidator
+  addAccountStub: AddAccount
+}
+
+function makeSut (): SutTypes {
+  const emailValidatorStub = makeEmailValidator()
+  const addAccountStub = makeAddAccount()
+  const sut = new SignUpController(emailValidatorStub, addAccountStub)
+  return { sut, emailValidatorStub, addAccountStub }
+}
+
+function makeEmailValidator (): EmailValidator {
+  class EmailValidatorStub implements EmailValidator {
+    isValid (_email: string): boolean {
+      return true
+    }
+  }
+  return new EmailValidatorStub()
+}
+
+function makeAddAccount (): AddAccount {
+  class AddAccountStub implements AddAccount {
+    async add (accountData: AddAccountModel): Promise<AccountModel> {
+      return await Promise.resolve(makeFakeAccount())
+    }
+  }
+  return new AddAccountStub()
+}
+
+function makeFakeAccount (): AccountModel {
+  return {
+    id: 'any_id',
+    name: 'any_name',
+    email: 'any_email@mail.com',
+    password: 'hashed_password'
+  }
+}
+
+function makeFakeRequest (): HttpRequest {
+  return {
+    body: {
+      name: 'any_name',
+      email: 'any_email@mail.com',
+      password: 'any_password',
+      passwordConfirmation: 'any_password'
+    }
+  }
+}
