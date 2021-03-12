@@ -1,6 +1,6 @@
 import { InvalidParamError } from '../../errors/Invalid-param-error'
 import { MissingParamError } from '../../errors/missing-param-error'
-import { badRequest } from '../../helpers/http-helper'
+import { badRequest, serverError } from '../../helpers/http-helper'
 import { EmailValidator } from '../../protocols/email-validator'
 import { HttpRequest } from '../../protocols/http'
 import { SignUpController } from './signup'
@@ -125,9 +125,6 @@ describe('Sign Up Controller', () => {
       .spyOn(emailValidatorStub, 'isValid')
       .mockImplementationOnce(() => { throw new Error() })
     const httpResponse = sut.handle(makeFakeRequest())
-    expect(httpResponse).toEqual({
-      statusCode: 500,
-      body: new Error('Internal server error')
-    })
+    expect(httpResponse).toEqual(serverError())
   })
 })
