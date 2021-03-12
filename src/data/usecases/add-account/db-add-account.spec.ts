@@ -10,6 +10,15 @@ describe('DbAddAccount Usecase', () => {
     await sut.add(accountData)
     expect(encryptSpy).toHaveBeenCalledWith(accountData.password)
   })
+  test('should throw if encrypter throws', async () => {
+    const { sut, encrypterStub } = makeSut()
+    jest
+      .spyOn(encrypterStub, 'encrypt')
+      .mockRejectedValueOnce(new Error())
+    const accountData = makeFakeAccountData()
+    const promise = sut.add(accountData)
+    await expect(promise).rejects.toThrow()
+  })
 })
 
 interface SutTypes {
