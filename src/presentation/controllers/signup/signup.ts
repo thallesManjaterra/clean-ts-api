@@ -21,9 +21,16 @@ export class SignUpController implements Controller {
     if (httpRequest.body.password !== httpRequest.body.passwordConfirmation) {
       return badRequest(new InvalidParamError('password'))
     }
-    const isEmailValid = this.emailValidator.isValid(httpRequest.body.email)
-    if (!isEmailValid) {
-      return badRequest(new InvalidParamError('email'))
+    try {
+      const isEmailValid = this.emailValidator.isValid(httpRequest.body.email)
+      if (!isEmailValid) {
+        return badRequest(new InvalidParamError('email'))
+      }
+    } catch (error) {
+      return {
+        statusCode: 500,
+        body: new Error('Internal server error')
+      }
     }
   }
 }
