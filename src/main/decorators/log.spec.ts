@@ -8,6 +8,11 @@ describe('LogController Decorator', () => {
     await sut.handle(makeFakeHttpRequest())
     expect(handleSpy).toHaveBeenCalledWith(makeFakeHttpRequest())
   })
+  test('should return the same as controller', async () => {
+    const { sut } = makeSut()
+    const httpResponse = await sut.handle(makeFakeHttpRequest())
+    expect(httpResponse).toEqual(makeFakeHttpReponse())
+  })
 })
 
 interface SutTypes {
