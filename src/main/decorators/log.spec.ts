@@ -1,3 +1,5 @@
+import { LogErrorRepository } from '../../data/protocols/log-error-repository'
+import { serverError } from '../../presentation/helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../presentation/protocols'
 import { LogControllerDecorator } from './log'
 
@@ -13,17 +15,27 @@ describe('LogController Decorator', () => {
     const httpResponse = await sut.handle(makeFakeHttpRequest())
     expect(httpResponse).toEqual(makeFakeHttpReponse())
   })
+  test('should call LogErrorRepository with correct value if controller returns a server erorr', async () => {
+    const { sut, controllerStub, logErrorRepositoryStub } = makeSut()
+    const fakeError = makeFakeError()
+    jest.spyOn(controllerStub, 'handle').mockResolvedValueOnce(serverError(fakeError))
+    const logSpy = jest.spyOn(logErrorRepositoryStub, 'log')
+    await sut.handle(makeFakeHttpRequest())
+    expect(logSpy).toHaveBeenCalledWith(fakeError.stack)
+  })
 })
 
 interface SutTypes {
   sut: LogControllerDecorator
   controllerStub: Controller
+  logErrorRepositoryStub: LogErrorRepository
 }
 
 function makeSut (): SutTypes {
   const controllerStub = makeController()
-  const sut = new LogControllerDecorator(controllerStub)
-  return { sut, controllerStub }
+  const logErrorRepositoryStub = makeFakeLogErrorRepository()
+  const sut = new LogControllerDecorator(controllerStub, logErrorRepositoryStub)
+  return { sut, controllerStub, logErrorRepositoryStub }
 }
 
 function makeController (): Controller {
@@ -39,6 +51,15 @@ function makeFakeHttpReponse (): HttpResponse {
   return { statusCode: 200, body: {} }
 }
 
+function makeFakeLogErrorRepository (): LogErrorRepository {
+  class LogErrorRepositoryStub implements LogErrorRepository {
+    async log (_errorStack: string): Promise<void> {
+      return await Promise.resolve()
+    }
+  }
+  return new LogErrorRepositoryStub()
+}
+
 function makeFakeHttpRequest (): HttpRequest {
   return {
     body: {
@@ -48,4 +69,10 @@ function makeFakeHttpRequest (): HttpRequest {
       passwordConfirmation: 'any_password'
     }
   }
+}
+
+function makeFakeError (): Error {
+  const fakeError = new Error()
+  fakeError.stack = 'any_stack'
+  return fakeError
 }
