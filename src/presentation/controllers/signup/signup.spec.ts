@@ -92,7 +92,7 @@ describe('Sign Up Controller', () => {
       .spyOn(emailValidatorStub, 'isValid')
       .mockImplementationOnce(() => { throw new Error() })
     const httpResponse = await sut.handle(makeFakeRequest())
-    expect(httpResponse).toEqual(serverError())
+    expect(httpResponse).toEqual(serverError(new Error()))
   })
   test('should return call AddAccount with correct values', async () => {
     const { sut, addAccountStub } = makeSut()
@@ -108,7 +108,7 @@ describe('Sign Up Controller', () => {
       .spyOn(addAccountStub, 'add')
       .mockRejectedValueOnce(new Error())
     const httpResponse = await sut.handle(makeFakeRequest())
-    expect(httpResponse).toEqual(serverError())
+    expect(httpResponse).toEqual(serverError(new Error()))
   })
   test('should return 200 on success', async () => {
     const { sut } = makeSut()
@@ -141,7 +141,7 @@ function makeEmailValidator (): EmailValidator {
 
 function makeAddAccount (): AddAccount {
   class AddAccountStub implements AddAccount {
-    async add (accountData: AddAccountModel): Promise<AccountModel> {
+    async add (_accountData: AddAccountModel): Promise<AccountModel> {
       return await Promise.resolve(makeFakeAccount())
     }
   }
