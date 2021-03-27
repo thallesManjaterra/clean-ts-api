@@ -9,6 +9,11 @@ describe('Validation Composite', () => {
     const error = sut.validate({})
     expect(error).toEqual(new MissingParamError('field'))
   })
+  test('should return null if validations succeeds', () => {
+    const { sut } = makeSut()
+    const error = sut.validate({})
+    expect(error).toEqual(null)
+  })
 })
 
 interface SutTypes {
