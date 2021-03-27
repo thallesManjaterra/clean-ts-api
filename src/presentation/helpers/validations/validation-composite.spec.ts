@@ -9,6 +9,14 @@ describe('Validation Composite', () => {
     const error = sut.validate({})
     expect(error).toEqual(new MissingParamError('field'))
   })
+  test('should stop validations and return the error as soon validation fails', () => {
+    const { sut, validationStubs } = makeSut()
+    jest.spyOn(validationStubs[0], 'validate').mockReturnValueOnce(new MissingParamError('field'))
+    const secondValidationSpy = jest.spyOn(validationStubs[1], 'validate').mockReturnValueOnce(new MissingParamError('another_field'))
+    const error = sut.validate({})
+    expect(secondValidationSpy).not.toHaveBeenCalled()
+    expect(error).toEqual(new MissingParamError('field'))
+  })
   test('should return null if validations succeeds', () => {
     const { sut } = makeSut()
     const error = sut.validate({})
