@@ -9,6 +9,13 @@ describe('Email Validation', () => {
     sut.validate({ email })
     expect(validateSpy).toHaveBeenCalledWith(email)
   })
+  test('should throw if EmailValidator throws', () => {
+    const { sut, emailValidatorStub } = makeSut()
+    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    expect(sut.validate).toThrow()
+  })
 })
 
 interface SutTypes {
