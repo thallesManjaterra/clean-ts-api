@@ -23,6 +23,11 @@ describe('Email Validation', () => {
     const error = sut.validate(makeFakeInput())
     expect(error).toEqual(new InvalidParamError('email'))
   })
+  test('should return null if EmailValidator succeeds', () => {
+    const { sut } = makeSut()
+    const error = sut.validate(makeFakeInput())
+    expect(error).toBe(null)
+  })
 })
 
 interface SutTypes {
