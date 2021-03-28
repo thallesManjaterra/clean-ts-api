@@ -1,8 +1,7 @@
 import { MissingParamError } from '../../errors'
 import { badRequest, ok, serverError } from '../../helpers/http/http-helper'
-import { Validation } from '../../protocols/validation'
 import { SignUpController } from './signup'
-import { HttpRequest, AddAccount, AddAccountModel, AccountModel } from './signup-protocols'
+import { AccountModel, AddAccount, AddAccountModel, HttpRequest, Validation } from './signup-protocols'
 
 describe('Sign Up Controller', () => {
   test('should call Validations with correct value', async () => {
