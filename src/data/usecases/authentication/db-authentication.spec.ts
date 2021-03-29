@@ -1,5 +1,6 @@
 import { AccountModel } from '../../../domain/models/account'
 import { AuthenticationDataModel } from '../../../domain/usecases/authentication'
+import { HashComparer } from '../../protocols/cryptography/hash-comparer'
 import { LoadAccountByEmailRepository } from '../../protocols/db/load-account-by-email-repository'
 import { DbAuthentication } from './db-authentication'
 
@@ -22,17 +23,26 @@ describe('DbAuthentication Usecase', () => {
     const accessToken = await sut.auth(makeFakeAuthenticationData())
     expect(accessToken).toBe(null)
   })
+  test('should call HashComparer with correct values', async () => {
+    const { sut, hashComparerStub } = makeSut()
+    const compareSpy = jest.spyOn(hashComparerStub, 'compare')
+    const authenticationData = makeFakeAuthenticationData()
+    await sut.auth(authenticationData)
+    expect(compareSpy).toHaveBeenCalledWith(authenticationData.password, makeFakeAccount().password)
+  })
 })
 
 interface SutTypes {
   sut: DbAuthentication
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
+  hashComparerStub: HashComparer
 }
 
 function makeSut (): SutTypes {
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepository()
-  const sut = new DbAuthentication(loadAccountByEmailRepositoryStub)
-  return { sut, loadAccountByEmailRepositoryStub }
+  const hashComparerStub = makeHashComparer()
+  const sut = new DbAuthentication(loadAccountByEmailRepositoryStub, hashComparerStub)
+  return { sut, loadAccountByEmailRepositoryStub, hashComparerStub }
 }
 
 function makeLoadAccountByEmailRepository (): LoadAccountByEmailRepository {
@@ -44,18 +54,27 @@ function makeLoadAccountByEmailRepository (): LoadAccountByEmailRepository {
   return new LoadAccountByEmailRepositoryStub()
 }
 
-function makeFakeAuthenticationData (): AuthenticationDataModel {
-  return {
-    email: 'any_email@mail.com',
-    password: 'any_passsword'
-  }
-}
-
 function makeFakeAccount (): AccountModel {
   return {
     id: 'any_id',
     name: 'any_name',
     email: 'any_email@mail.com',
     password: 'hashed_password'
+  }
+}
+
+function makeHashComparer (): HashComparer {
+  class HashComparerStub implements HashComparer {
+    async compare (_value: string, _hash: string): Promise<boolean> {
+      return await Promise.resolve(true)
+    }
+  }
+  return new HashComparerStub()
+}
+
+function makeFakeAuthenticationData (): AuthenticationDataModel {
+  return {
+    email: 'any_email@mail.com',
+    password: 'any_passsword'
   }
 }
