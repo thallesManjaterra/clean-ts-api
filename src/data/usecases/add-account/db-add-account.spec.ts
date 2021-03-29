@@ -1,5 +1,5 @@
-import { Encrypter, AddAccountRepository, AddAccountModel, AccountModel } from './db-add-account-protocols'
 import { DbAddAccount } from './db-add-account'
+import { AddAccountRepository, AddAccountModel, AccountModel, Encrypter } from './db-add-account-protocols'
 
 describe('DbAddAccount Usecase', () => {
   test('should call encrypter with correct password', async () => {
@@ -67,7 +67,7 @@ function makeFakeHash (): string {
 
 function makeAddAccountRepository (): AddAccountRepository {
   class AddAccountRepositoryStub implements AddAccountRepository {
-    async add (accountData: AddAccountModel): Promise<AccountModel> {
+    async add (_accountData: AddAccountModel): Promise<AccountModel> {
       return await Promise.resolve(makeFakeAccount())
     }
   }
