@@ -54,6 +54,11 @@ describe('DbAuthentication Usecase', () => {
     jest.spyOn(tokenGeneratorStub, 'generate').mockRejectedValueOnce(new Error())
     await expect(sut.auth).rejects.toThrow()
   })
+  test('should return an accessToken on success', async () => {
+    const { sut } = makeSut()
+    const accessToken = await sut.auth(makeFakeAuthenticationData())
+    expect(accessToken).toBe(makeFakeToken())
+  })
 })
 
 interface SutTypes {
