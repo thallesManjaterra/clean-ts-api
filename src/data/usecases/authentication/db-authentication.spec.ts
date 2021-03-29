@@ -1,6 +1,7 @@
 import { AccountModel } from '../../../domain/models/account'
 import { AuthenticationDataModel } from '../../../domain/usecases/authentication'
 import { HashComparer } from '../../protocols/cryptography/hash-comparer'
+import { TokenGenerator } from '../../protocols/cryptography/token-generator'
 import { LoadAccountByEmailRepository } from '../../protocols/db/load-account-by-email-repository'
 import { DbAuthentication } from './db-authentication'
 
@@ -41,19 +42,28 @@ describe('DbAuthentication Usecase', () => {
     const accessToken = await sut.auth(makeFakeAuthenticationData())
     expect(accessToken).toBe(null)
   })
+  test('should call TokenGenerator with correct id', async () => {
+    const { sut, tokenGeneratorStub } = makeSut()
+    const generateSpy = jest.spyOn(tokenGeneratorStub, 'generate')
+    const authenticationData = makeFakeAuthenticationData()
+    await sut.auth(authenticationData)
+    expect(generateSpy).toHaveBeenCalledWith(makeFakeAccount().id)
+  })
 })
 
 interface SutTypes {
   sut: DbAuthentication
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
   hashComparerStub: HashComparer
+  tokenGeneratorStub: TokenGenerator
 }
 
 function makeSut (): SutTypes {
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepository()
   const hashComparerStub = makeHashComparer()
-  const sut = new DbAuthentication(loadAccountByEmailRepositoryStub, hashComparerStub)
-  return { sut, loadAccountByEmailRepositoryStub, hashComparerStub }
+  const tokenGeneratorStub = makeTokenGenerator()
+  const sut = new DbAuthentication(loadAccountByEmailRepositoryStub, hashComparerStub, tokenGeneratorStub)
+  return { sut, loadAccountByEmailRepositoryStub, hashComparerStub, tokenGeneratorStub }
 }
 
 function makeLoadAccountByEmailRepository (): LoadAccountByEmailRepository {
@@ -81,6 +91,19 @@ function makeHashComparer (): HashComparer {
     }
   }
   return new HashComparerStub()
+}
+
+function makeTokenGenerator (): TokenGenerator {
+  class TokenGeneratorStub implements TokenGenerator {
+    async generate (_id: string): Promise<string> {
+      return await Promise.resolve(makeFakeToken())
+    }
+  }
+  return new TokenGeneratorStub()
+}
+
+function makeFakeToken (): string {
+  return 'any_token'
 }
 
 function makeFakeAuthenticationData (): AuthenticationDataModel {
