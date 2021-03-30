@@ -2,7 +2,7 @@ import request from 'supertest'
 import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helper'
 import app from '../config/app'
 
-describe('Signup Routes', () => {
+describe('Login Routes', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
   })
@@ -13,19 +13,21 @@ describe('Signup Routes', () => {
   afterAll(async () => {
     await MongoHelper.disconnect()
   })
-  test('should return an account on success', async () => {
-    await request(app)
-      .post('/api/signup')
-      .send(makeFakeNewAccount())
-      .expect(200)
-      .then(({ body: account }) => {
-        expect(account).toBeTruthy()
-        expect(account.id).toBeTruthy()
-        expect(account.password).toBeTruthy()
-        expect(account.password).not.toEqual(makeFakeNewAccount().password)
-        expect(account.email).toBe(makeFakeNewAccount().email)
-        expect(account.name).toBe(makeFakeNewAccount().name)
-      })
+  describe('POST /signup', () => {
+    test('should return an account on signup', async () => {
+      await request(app)
+        .post('/api/signup')
+        .send(makeFakeNewAccount())
+        .expect(200)
+        .then(({ body: account }) => {
+          expect(account).toBeTruthy()
+          expect(account.id).toBeTruthy()
+          expect(account.password).toBeTruthy()
+          expect(account.password).not.toEqual(makeFakeNewAccount().password)
+          expect(account.email).toBe(makeFakeNewAccount().email)
+          expect(account.name).toBe(makeFakeNewAccount().name)
+        })
+    })
   })
 })
 
