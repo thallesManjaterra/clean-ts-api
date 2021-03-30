@@ -4,19 +4,19 @@ import { AccountModel, AuthenticationDataModel, HashComparer, LoadAccountByEmail
 describe('DbAuthentication Usecase', () => {
   test('should call LoadAccountByEmailRepository with correct email', async () => {
     const { sut, loadAccountByEmailRepositoryStub } = makeSut()
-    const loadSpy = jest.spyOn(loadAccountByEmailRepositoryStub, 'load')
+    const loadSpy = jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail')
     const authenticationData = makeFakeAuthenticationData()
     await sut.auth(authenticationData)
     expect(loadSpy).toHaveBeenCalledWith(authenticationData.email)
   })
   test('should throw if LoadAccountByEmailRepository throws', async () => {
     const { sut, loadAccountByEmailRepositoryStub } = makeSut()
-    jest.spyOn(loadAccountByEmailRepositoryStub, 'load').mockRejectedValueOnce(new Error())
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockRejectedValueOnce(new Error())
     await expect(sut.auth).rejects.toThrow()
   })
   test('should return null if LoadAccountByEmailRepository returns null', async () => {
     const { sut, loadAccountByEmailRepositoryStub } = makeSut()
-    jest.spyOn(loadAccountByEmailRepositoryStub, 'load').mockResolvedValueOnce(null)
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockResolvedValueOnce(null)
     const accessToken = await sut.auth(makeFakeAuthenticationData())
     expect(accessToken).toBe(null)
   })
@@ -87,7 +87,7 @@ function makeSut (): SutTypes {
 
 function makeLoadAccountByEmailRepository (): LoadAccountByEmailRepository {
   class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
-    async load (_email: string): Promise<AccountModel> {
+    async loadByEmail (_email: string): Promise<AccountModel> {
       return await Promise.resolve(makeFakeAccount())
     }
   }
