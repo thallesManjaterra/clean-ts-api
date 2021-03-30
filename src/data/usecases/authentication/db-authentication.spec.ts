@@ -47,7 +47,7 @@ describe('DbAuthentication Usecase', () => {
   })
   test('should throw if Encrypter throws', async () => {
     const { sut, encrypterStub } = makeSut()
-    jest.spyOn(encrypterStub, 'encrypt').mockRejectedValueOnce(new Error())
+    jest.spyOn(encrypterStub, 'encrypt').mockImplementationOnce(() => { throw new Error() })
     await expect(sut.auth).rejects.toThrow()
   })
   test('should return an accessToken on success', async () => {
@@ -114,8 +114,8 @@ function makeHashComparer (): HashComparer {
 
 function makeEncrypter (): Encrypter {
   class EncrypterStub implements Encrypter {
-    async encrypt (_id: string): Promise<string> {
-      return await Promise.resolve(makeFakeToken())
+    encrypt (_id: string): string {
+      return makeFakeToken()
     }
   }
   return new EncrypterStub()
