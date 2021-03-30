@@ -42,6 +42,17 @@ describe('Account Mongo Repository', () => {
     const account = await sut.loadByEmail(accountData.email)
     expect(account).toBe(null)
   })
+  test('should update account accessToken on updateAccessToken success', async () => {
+    const sut = new AccountMongoRepository()
+    const accountData = makeFakeAccountData()
+    const { ops: [accountWithoutToken] } = await accountCollection.insertOne(accountData)
+    expect(accountWithoutToken.accessToken).toBe(undefined)
+    const { _id } = accountWithoutToken
+    await sut.updateAccessToken(_id, 'any_token')
+    const accountWithToken = await accountCollection.findOne({ _id })
+    expect(accountWithToken).toBeTruthy()
+    expect(accountWithToken.accessToken).toBe('any_token')
+  })
 })
 
 function makeFakeAccountData (): AddAccountModel {
