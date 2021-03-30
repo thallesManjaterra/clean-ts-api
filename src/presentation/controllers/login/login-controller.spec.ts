@@ -2,9 +2,31 @@ import { AuthenticationDataModel } from '../../../domain/usecases/authentication
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, ok, serverError, unauthorized } from '../../helpers/http/http-helper'
 import { LoginController } from './login-controller'
-import { Authentication, EmailValidator, HttpRequest } from './login-controller-protocols'
+import { Authentication, EmailValidator, HttpRequest, Validation } from './login-controller-protocols'
 
 describe('Login Controller', () => {
+  test('should call Validations with correct value', async () => {
+    const { sut, validationStub } = makeSut()
+    const validateSpy = jest.spyOn(validationStub, 'validate')
+    const httpRequest = makeFakeRequest()
+    await sut.handle(httpRequest)
+    expect(validateSpy).toHaveBeenCalledWith(httpRequest.body)
+  })
+  test('should return 500 if Validation throws', async () => {
+    const { sut, validationStub } = makeSut()
+    jest
+      .spyOn(validationStub, 'validate')
+      .mockImplementationOnce(() => { throw new Error() })
+    const httpResponse = await sut.handle(makeFakeRequest())
+    expect(httpResponse).toEqual(serverError(new Error()))
+  })
+  test('should return 400 if Validation returns an error', async () => {
+    const { sut, validationStub } = makeSut()
+    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new MissingParamError('any_field'))
+    const httpRequest = makeFakeRequest()
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toEqual(badRequest(new MissingParamError('any_field')))
+  })
   test('should returns 400 if no email is provided', async () => {
     const { sut } = makeSut()
     const httpRequest = {
@@ -87,15 +109,26 @@ describe('Login Controller', () => {
 
 interface SutTypes {
   sut: LoginController
+  validationStub: Validation
   emailValidatorStub: EmailValidator
   authenticationStub: Authentication
 }
 
 function makeSut (): SutTypes {
+  const validationStub = makeValidation()
   const emailValidatorStub = makeEmailValidator()
   const authenticationStub = makeAuthentication()
-  const sut = new LoginController(emailValidatorStub, authenticationStub)
-  return { sut, emailValidatorStub, authenticationStub }
+  const sut = new LoginController(validationStub, emailValidatorStub, authenticationStub)
+  return { sut, validationStub, emailValidatorStub, authenticationStub }
+}
+
+function makeValidation (): Validation {
+  class ValidationStub implements Validation {
+    validate (_input: any): null | Error {
+      return null
+    }
+  }
+  return new ValidationStub()
 }
 
 function makeEmailValidator (): EmailValidator {
