@@ -36,6 +36,12 @@ describe('Account Mongo Repository', () => {
     expect(account.email).toBe(accountData.email)
     expect(account.password).toBe(accountData.password)
   })
+  test('should return null if LoadByEmail fails', async () => {
+    const sut = new AccountMongoRepository()
+    const accountData = makeFakeAccountData()
+    const account = await sut.loadByEmail(accountData.email)
+    expect(account).toBe(null)
+  })
 })
 
 function makeFakeAccountData (): AddAccountModel {
