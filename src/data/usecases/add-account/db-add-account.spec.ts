@@ -1,18 +1,18 @@
 import { DbAddAccount } from './db-add-account'
-import { AddAccountRepository, AddAccountModel, AccountModel, Encrypter } from './db-add-account-protocols'
+import { AddAccountRepository, AddAccountModel, AccountModel, Hasher } from './db-add-account-protocols'
 
 describe('DbAddAccount Usecase', () => {
-  test('should call encrypter with correct password', async () => {
-    const { sut, encrypterStub } = makeSut()
-    const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
+  test('should call Hasher with correct password', async () => {
+    const { sut, hasherStub } = makeSut()
+    const hashSpy = jest.spyOn(hasherStub, 'hash')
     const accountData = makeFakeAccountData()
     await sut.add(accountData)
-    expect(encryptSpy).toHaveBeenCalledWith(accountData.password)
+    expect(hashSpy).toHaveBeenCalledWith(accountData.password)
   })
-  test('should throw if encrypter throws', async () => {
-    const { sut, encrypterStub } = makeSut()
+  test('should throw if Hasher throws', async () => {
+    const { sut, hasherStub } = makeSut()
     jest
-      .spyOn(encrypterStub, 'encrypt')
+      .spyOn(hasherStub, 'hash')
       .mockRejectedValueOnce(new Error())
     const promise = sut.add(makeFakeAccountData())
     await expect(promise).rejects.toThrow()
@@ -41,24 +41,24 @@ describe('DbAddAccount Usecase', () => {
 
 interface SutTypes {
   sut: DbAddAccount
-  encrypterStub: Encrypter
+  hasherStub: Hasher
   addAccountRepositoryStub: AddAccountRepository
 }
 
 function makeSut (): SutTypes {
-  const encrypterStub = makeEncrypter()
+  const hasherStub = makeHasher()
   const addAccountRepositoryStub = makeAddAccountRepository()
-  const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub)
-  return { sut, encrypterStub, addAccountRepositoryStub }
+  const sut = new DbAddAccount(hasherStub, addAccountRepositoryStub)
+  return { sut, hasherStub, addAccountRepositoryStub }
 }
 
-function makeEncrypter (): Encrypter {
-  class EncrypterStub implements Encrypter {
-    async encrypt (_value: string): Promise<string> {
+function makeHasher (): Hasher {
+  class HasherStub implements Hasher {
+    async hash (_value: string): Promise<string> {
       return await Promise.resolve(makeFakeHash())
     }
   }
-  return new EncrypterStub()
+  return new HasherStub()
 }
 
 function makeFakeHash (): string {
