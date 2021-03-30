@@ -41,6 +41,12 @@ describe('Bcrypt Adapter', () => {
     const areValuAndHashEquals = await sut.compare('any_value', 'any_hash')
     expect(areValuAndHashEquals).toBe(true)
   })
+  test('should return false when compare fails', async () => {
+    const { sut } = makeSut()
+    jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false)
+    const areValuAndHashEquals = await sut.compare('any_value', 'any_hash')
+    expect(areValuAndHashEquals).toBe(false)
+  })
 })
 
 interface SutTypes {
