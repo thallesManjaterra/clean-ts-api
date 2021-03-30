@@ -1,8 +1,8 @@
 import { AuthenticationDataModel } from '../../../domain/usecases/authentication'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, ok, serverError, unauthorized } from '../../helpers/http/http-helper'
-import { LoginController } from './login'
-import { Authentication, EmailValidator, HttpRequest } from './login-protocols'
+import { LoginController } from './login-controller'
+import { Authentication, EmailValidator, HttpRequest } from './login-controller-protocols'
 
 describe('Login Controller', () => {
   test('should returns 400 if no email is provided', async () => {
