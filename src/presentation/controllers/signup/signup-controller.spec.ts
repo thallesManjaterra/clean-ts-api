@@ -45,7 +45,7 @@ describe('Sign Up Controller', () => {
   test('should return 200 on success', async () => {
     const { sut } = makeSut()
     const httpResponse = await sut.handle(makeFakeRequest())
-    expect(httpResponse).toEqual(ok(makeFakeAccount()))
+    expect(httpResponse).toEqual(ok({ accessToken: makeFakeToken() }))
   })
   test('should call Authentication with correct values', async () => {
     const { sut, authenticationStub } = makeSut()
