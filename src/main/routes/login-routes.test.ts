@@ -17,19 +17,11 @@ describe('Login Routes', () => {
     await MongoHelper.disconnect()
   })
   describe('POST /signup', () => {
-    test('should return an account on signup', async () => {
+    test('should return 200 on signup', async () => {
       await request(app)
         .post('/api/signup')
         .send(makeFakeNewAccount())
         .expect(200)
-        .then(({ body: account }) => {
-          expect(account).toBeTruthy()
-          expect(account.id).toBeTruthy()
-          expect(account.password).toBeTruthy()
-          expect(account.password).not.toEqual(makeFakeNewAccount().password)
-          expect(account.email).toBe(makeFakeNewAccount().email)
-          expect(account.name).toBe(makeFakeNewAccount().name)
-        })
     })
   })
   describe('POST /login', () => {
