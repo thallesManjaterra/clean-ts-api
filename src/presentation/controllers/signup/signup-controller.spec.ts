@@ -1,7 +1,7 @@
-import { MissingParamError, EmailInUseError } from '../../errors'
+import { EmailInUseError, MissingParamError } from '../../errors'
 import { badRequest, forbidden, ok, serverError } from '../../helpers/http/http-helper'
 import { SignUpController } from './signup-controller'
-import { AccountModel, AddAccount, AddAccountModel, HttpRequest, Validation, Authentication, AuthenticationDataModel } from './signup-controller-protocols'
+import { AccountModel, AddAccount, AddAccountModel, Authentication, AuthenticationDataModel, HttpRequest, Validation } from './signup-controller-protocols'
 
 describe('Sign Up Controller', () => {
   test('should call Validations with correct value', async () => {
