@@ -4,5 +4,6 @@ import { AccountMongoRepository } from '../../../../infra/db/mongodb/account/acc
 import { makeBcryptAdapter } from '../../adapters/bcrypt-adapter-factory'
 
 export function makeDbAddAccount (): AddAccount {
-  return new DbAddAccount(makeBcryptAdapter(), new AccountMongoRepository())
+  const accountMongoRepository = new AccountMongoRepository()
+  return new DbAddAccount(makeBcryptAdapter(), accountMongoRepository, accountMongoRepository)
 }
