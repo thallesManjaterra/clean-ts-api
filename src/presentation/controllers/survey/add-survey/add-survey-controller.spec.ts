@@ -64,7 +64,7 @@ function makeValidation (): Validation {
 
 function makeAddSurvey (): AddSurvey {
   class AddSurveyStub implements AddSurvey {
-    async add (_data: AddSurveyDataModel): Promise<void> {
+    async add (_surveyData: AddSurveyDataModel): Promise<void> {
       return await Promise.resolve()
     }
   }

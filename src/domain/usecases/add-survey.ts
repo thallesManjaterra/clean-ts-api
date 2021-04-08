@@ -9,5 +9,5 @@ export interface AddSurveyDataModel {
 }
 
 export interface AddSurvey {
-  add: (data: AddSurveyDataModel) => Promise<void>
+  add: (surveyData: AddSurveyDataModel) => Promise<void>
 }
