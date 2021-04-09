@@ -38,6 +38,11 @@ describe('DbloadAccountByToken Usecase', () => {
     jest.spyOn(decrypterStub, 'decrypt').mockImplementationOnce(() => { throw new Error() })
     await expect(sut.load).rejects.toThrow()
   })
+  test('should throw if LoadAccountByTokenRepository throws', async () => {
+    const { sut, loadAccountByTokenRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByTokenRepositoryStub, 'loadByToken').mockRejectedValueOnce(new Error())
+    await expect(sut.load).rejects.toThrow()
+  })
 })
 
 interface SutTypes {
