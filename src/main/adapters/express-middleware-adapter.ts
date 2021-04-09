@@ -13,10 +13,11 @@ export function adaptMiddleware (middleware: Middleware): ExpressMiddlewareHandl
         if (httpResponse.statusCode === 200) {
           Object.assign(req, httpResponse.body)
           next()
+        } else {
+          res
+            .status(httpResponse.statusCode)
+            .json({ error: httpResponse.body.message })
         }
-        res
-          .status(httpResponse.statusCode)
-          .json({ error: httpResponse.body.message })
       })
       .catch(console.error)
   }
