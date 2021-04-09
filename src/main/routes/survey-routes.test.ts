@@ -4,7 +4,7 @@ import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helper'
 import app from '../config/app'
 import { AddSurveyDataModel } from '../../domain/usecases/add-survey'
 
-describe('Login Routes', () => {
+describe('Survey Routes', () => {
   let surveyCollection: Collection
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
@@ -17,11 +17,11 @@ describe('Login Routes', () => {
     await MongoHelper.disconnect()
   })
   describe('POST /survey', () => {
-    test('should return 204 on add survey success', async () => {
+    test('should return 403 on add survey without accessToken', async () => {
       await request(app)
         .post('/api/survey')
         .send(makeFakeSurvey())
-        .expect(204)
+        .expect(403)
     })
   })
 })
