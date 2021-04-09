@@ -60,7 +60,7 @@ function makeSut (): SutTypes {
 
 function makeDecrypter (): Decrypter {
   class DecrypterStub implements Decrypter {
-    decrypt (value: string): string {
+    decrypt (token: string): string {
       return 'any_value'
     }
   }
