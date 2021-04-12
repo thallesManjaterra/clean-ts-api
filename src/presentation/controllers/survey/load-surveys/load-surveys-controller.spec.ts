@@ -2,6 +2,9 @@ import { LoadSurveysController } from './load-surveys-controller'
 import { LoadSurveys, SurveyModel } from './load-surveys-controller-protocols'
 
 describe('LoadSurveys Controller', () => {
+  beforeAll(() => {
+    jest.useFakeTimers('modern').setSystemTime(new Date(2020, 9, 1, 7))
+  })
   test('should call LoadSurveys', async () => {
     const { sut, loadSurveysStub } = makeSut()
     const loadSpy = jest.spyOn(loadSurveysStub, 'load')

@@ -3,6 +3,9 @@ import { AddSurvey, AddSurveyDataModel, HttpRequest, Validation } from './add-su
 import { badRequest, noContent, serverError } from '../../../helpers/http/http-helper'
 
 describe('AddSurvey Controller', () => {
+  beforeAll(() => {
+    jest.useFakeTimers('modern').setSystemTime(new Date(2020, 9, 1, 7))
+  })
   test('should call Validation with correct values', async () => {
     const { sut, validationStub } = makeSut()
     const validateSpy = jest.spyOn(validationStub, 'validate')
