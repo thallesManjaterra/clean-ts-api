@@ -35,6 +35,7 @@ function makeFakeSurveyData (): AddSurveyDataModel {
       {
         answer: 'any_answer'
       }
-    ]
+    ],
+    date: new Date()
   }
 }
