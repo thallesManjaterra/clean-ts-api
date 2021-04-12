@@ -3,18 +3,32 @@ import { LoadSurveys, SurveyModel } from './load-surveys-controller-protocols'
 
 describe('LoadSurveys Controller', () => {
   test('should call LoadSurveys', async () => {
-    class LoadSurveysStub implements LoadSurveys {
-      async load (): Promise<SurveyModel[]> {
-        return await Promise.resolve(makeFakeSurveys())
-      }
-    }
-    const loadSurveysStub = new LoadSurveysStub()
-    const sut = new LoadSurveysController(loadSurveysStub)
+    const { sut, loadSurveysStub } = makeSut()
     const loadSpy = jest.spyOn(loadSurveysStub, 'load')
     await sut.handle({})
     expect(loadSpy).toHaveBeenCalled()
   })
 })
+
+interface SutTypes {
+  sut: LoadSurveysController
+  loadSurveysStub: LoadSurveys
+}
+
+function makeSut (): SutTypes {
+  const loadSurveysStub = makeLoadSurveys()
+  const sut = new LoadSurveysController(loadSurveysStub)
+  return { sut, loadSurveysStub }
+}
+
+function makeLoadSurveys (): LoadSurveys {
+  class LoadSurveysStub implements LoadSurveys {
+    async load (): Promise<SurveyModel[]> {
+      return await Promise.resolve(makeFakeSurveys())
+    }
+  }
+  return new LoadSurveysStub()
+}
 
 function makeFakeSurveys (): SurveyModel[] {
   return [
