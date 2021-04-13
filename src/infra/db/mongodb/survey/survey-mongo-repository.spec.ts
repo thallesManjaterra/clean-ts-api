@@ -34,6 +34,11 @@ describe('SurveyMongo Repository', () => {
       const surveys = await sut.loadAll()
       expect(surveys.length).toBe(2)
     })
+    test('should load an empty list if no survey exists', async () => {
+      const sut = makeSut()
+      const surveys = await sut.loadAll()
+      expect(surveys.length).toBe(0)
+    })
   })
 })
 
