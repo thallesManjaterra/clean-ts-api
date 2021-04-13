@@ -10,11 +10,11 @@
     "build:watch": "tsc -w",
     "up": "npm run build && docker-compose up -d",
     "down": "docker-compose down",
-    "test": "jest --noStackTrace",
+    "test": "jest --noStackTrace --runInBand",
     "test:unit": "npm test -- --watch -c jest-unit-config.js",
     "test:integration": "npm test -- --watch -c jest-integration-config.js",
-    "test:staged": "jest --bail --findRelatedTests",
-    "test:ci": "jest --coverage --passWithNoTests"
+    "test:staged": "jest --bail --findRelatedTests --runInBand",
+    "test:ci": "jest --coverage --passWithNoTests --runInBand"
   },
   "keywords": [],
   "author": "",
