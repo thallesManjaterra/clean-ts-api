@@ -17,6 +17,11 @@ describe('DbLoadSurveys Usecase', () => {
     const surveys = await sut.load()
     expect(surveys).toEqual(makeFakeSurveys())
   })
+  test('should throw if LoadSurveysRepository throws', async () => {
+    const { sut, loadSurveysRepositoryStub } = makeSut()
+    jest.spyOn(loadSurveysRepositoryStub, 'loadAll').mockRejectedValueOnce(new Error())
+    await expect(sut.load).rejects.toThrow()
+  })
 })
 
 interface SutTypes {
