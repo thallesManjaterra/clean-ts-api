@@ -6,9 +6,9 @@ import { sign } from 'jsonwebtoken'
 import env from '../config/env'
 import { AddSurveyDataModel } from '../../domain/usecases/add-survey'
 
+let surveyCollection: Collection
+let accountCollection: Collection
 describe('Survey Routes', () => {
-  let surveyCollection: Collection
-  let accountCollection: Collection
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
   })
@@ -25,24 +25,18 @@ describe('Survey Routes', () => {
     test('should return 403 on add survey without accessToken', async () => {
       await request(app)
         .post('/api/survey')
-        .send(makeFakeSurvey())
+        .send(makeFakeSurveyRequest())
         .expect(403)
     })
     test('should return 204 on add survey with valid accessToken', async () => {
-      const newAccount = makeFakeAccount()
+      const newAccount = makeFakeAccountData()
       newAccount.role = 'admin'
-      const res = await accountCollection.insertOne(newAccount)
-      const id = res.ops[0]._id
-      const accessToken = sign({ id }, env.jwtSecretKey)
-      await accountCollection.updateOne({ _id: id }, {
-        $set: {
-          accessToken
-        }
-      })
+      const account = await insertFakeAccount(newAccount)
+      const accessToken = await updateAndReturnAccessToken(account.id)
       await request(app)
         .post('/api/survey')
         .set('x-access-token', accessToken)
-        .send(makeFakeSurvey())
+        .send(makeFakeSurveyRequest())
         .expect(204)
     })
   })
@@ -53,19 +47,9 @@ describe('Survey Routes', () => {
         .expect(403)
     })
     test('should return 200 on load surveys with valid accessToken', async () => {
-      const newAccount = makeFakeAccount()
-      const res = await accountCollection.insertOne(newAccount)
-      const id = res.ops[0]._id
-      const accessToken = sign({ id }, env.jwtSecretKey)
-      await accountCollection.updateOne({ _id: id }, {
-        $set: {
-          accessToken
-        }
-      })
-      await surveyCollection.insertMany([
-        makeFakeSurveyData(),
-        makeFakeSurveyData()
-      ])
+      const account = await insertFakeAccount(makeFakeAccountData())
+      const accessToken = await updateAndReturnAccessToken(account.id)
+      await insertFakeSurveys()
       await request(app)
         .get('/api/surveys')
         .set('x-access-token', accessToken)
@@ -73,6 +57,27 @@ describe('Survey Routes', () => {
     })
   })
 })
+async function insertFakeSurveys (): Promise<void> {
+  await surveyCollection.insertMany([
+    makeFakeSurveyData(),
+    makeFakeSurveyData()
+  ])
+}
+
+async function insertFakeAccount (newAccount: any): Promise<any> {
+  const { ops: [account] } = await accountCollection.insertOne(newAccount)
+  return MongoHelper.formatId(account)
+}
+
+async function updateAndReturnAccessToken (id: string): Promise<string> {
+  const accessToken = sign({ id }, env.jwtSecretKey)
+  await accountCollection.updateOne({ _id: id }, {
+    $set: {
+      accessToken
+    }
+  })
+  return accessToken
+}
 
 function makeFakeSurveyData (): AddSurveyDataModel {
   return {
@@ -90,7 +95,7 @@ function makeFakeSurveyData (): AddSurveyDataModel {
   }
 }
 
-function makeFakeSurvey (): any {
+function makeFakeSurveyRequest (): any {
   return {
     question: 'Question',
     answers: [
@@ -105,10 +110,10 @@ function makeFakeSurvey (): any {
   }
 }
 
-function makeFakeAccount (): any {
+function makeFakeAccountData (): any {
   return {
     name: 'any_name',
     email: 'any_email@mail.com',
-    password: 'any_password'
+    password: 'hashed_password'
   }
 }

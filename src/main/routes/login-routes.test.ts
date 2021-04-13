@@ -4,8 +4,8 @@ import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helper'
 import app from '../config/app'
 import { hash } from 'bcrypt'
 
+let accountCollection: Collection
 describe('Login Routes', () => {
-  let accountCollection: Collection
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
   })
@@ -20,51 +20,53 @@ describe('Login Routes', () => {
     test('should return 200 on signup', async () => {
       await request(app)
         .post('/api/signup')
-        .send(makeFakeNewAccount())
+        .send(makeFakeNewAccountData())
         .expect(200)
     })
   })
   describe('POST /login', () => {
     test('should return 200 on login', async () => {
-      const salt = 12
-      const hashedPassword = await hash('any_password', salt)
-      await accountCollection.insertOne({
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: hashedPassword
-      })
+      await insertFakeAccount()
       await request(app)
         .post('/api/login')
-        .send({
-          email: 'any_email@mail.com',
-          password: 'any_password'
-        })
+        .send(makeFakeLoginData())
         .expect(200)
     })
     test('should return 401 on login', async () => {
       await request(app)
         .post('/api/login')
-        .send({
-          email: 'any_email@mail.com',
-          password: 'any_password'
-        })
+        .send(makeFakeLoginData())
         .expect(401)
     })
   })
 })
 
-interface NewAccount {
-  name: string
-  email: string
-  password: string
-  passwordConfirmation: string
+const ANY_NAME = 'any_name'
+const ANY_EMAIL = 'any_email@mail.com'
+const ANY_PASSWORD = 'any_password'
+
+async function insertFakeAccount (): Promise<void> {
+  const salt = 12
+  const hashedPassword = await hash(ANY_PASSWORD, salt)
+  await accountCollection.insertOne({
+    name: ANY_NAME,
+    email: ANY_EMAIL,
+    password: hashedPassword
+  })
 }
 
-function makeFakeNewAccount (): NewAccount {
+function makeFakeLoginData (): any {
   return {
-    name: 'any_name',
-    email: 'any_email@mail.com',
-    password: 'any_password',
-    passwordConfirmation: 'any_password'
+    email: ANY_EMAIL,
+    password: ANY_PASSWORD
+  }
+}
+
+function makeFakeNewAccountData (): any {
+  return {
+    name: ANY_NAME,
+    email: ANY_EMAIL,
+    password: ANY_PASSWORD,
+    passwordConfirmation: ANY_PASSWORD
   }
 }
