@@ -3,11 +3,19 @@ import { LoadSurveysRepository } from '../../protocols/db/survey/load-surveys-re
 import { DbLoadSurveys } from './db-load-surveys'
 
 describe('DbLoadSurveys Usecase', () => {
+  beforeAll(() => {
+    jest.useFakeTimers('modern').setSystemTime(new Date(2020, 9, 1, 7))
+  })
   test('should call LoadSurveysRepository', async () => {
     const { sut, loadSurveysRepositoryStub } = makeSut()
     const loadAllSpy = jest.spyOn(loadSurveysRepositoryStub, 'loadAll')
     await sut.load()
     expect(loadAllSpy).toHaveBeenCalled()
+  })
+  test('should return a list of surveys on success', async () => {
+    const { sut } = makeSut()
+    const surveys = await sut.load()
+    expect(surveys).toEqual(makeFakeSurveys())
   })
 })
 
