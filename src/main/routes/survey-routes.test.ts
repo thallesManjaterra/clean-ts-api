@@ -2,7 +2,6 @@ import { Collection } from 'mongodb'
 import request from 'supertest'
 import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helper'
 import app from '../config/app'
-import { AddSurveyDataModel } from '../../domain/usecases/add-survey'
 import { sign } from 'jsonwebtoken'
 import env from '../config/env'
 
@@ -49,9 +48,16 @@ describe('Survey Routes', () => {
         .expect(204)
     })
   })
+  describe('GET /surveys', () => {
+    test('should return 403 on load surveys without accessToken', async () => {
+      await request(app)
+        .get('/api/surveys')
+        .expect(403)
+    })
+  })
 })
 
-function makeFakeSurvey (): AddSurveyDataModel {
+function makeFakeSurvey (): any {
   return {
     question: 'Question',
     answers: [
