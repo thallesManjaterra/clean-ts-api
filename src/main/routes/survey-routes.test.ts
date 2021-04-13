@@ -4,6 +4,7 @@ import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helper'
 import app from '../config/app'
 import { sign } from 'jsonwebtoken'
 import env from '../config/env'
+import { AddSurveyDataModel } from '../../domain/usecases/add-survey'
 
 describe('Survey Routes', () => {
   let surveyCollection: Collection
@@ -28,12 +29,9 @@ describe('Survey Routes', () => {
         .expect(403)
     })
     test('should return 204 on add survey with valid accessToken', async () => {
-      const res = await accountCollection.insertOne({
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password',
-        role: 'admin'
-      })
+      const newAccount = makeFakeAccount()
+      newAccount.role = 'admin'
+      const res = await accountCollection.insertOne(newAccount)
       const id = res.ops[0]._id
       const accessToken = sign({ id }, env.jwtSecretKey)
       await accountCollection.updateOne({ _id: id }, {
@@ -54,8 +52,43 @@ describe('Survey Routes', () => {
         .get('/api/surveys')
         .expect(403)
     })
+    test('should return 200 on load surveys with valid accessToken', async () => {
+      const newAccount = makeFakeAccount()
+      const res = await accountCollection.insertOne(newAccount)
+      const id = res.ops[0]._id
+      const accessToken = sign({ id }, env.jwtSecretKey)
+      await accountCollection.updateOne({ _id: id }, {
+        $set: {
+          accessToken
+        }
+      })
+      await surveyCollection.insertMany([
+        makeFakeSurveyData(),
+        makeFakeSurveyData()
+      ])
+      await request(app)
+        .get('/api/surveys')
+        .set('x-access-token', accessToken)
+        .expect(200)
+    })
   })
 })
+
+function makeFakeSurveyData (): AddSurveyDataModel {
+  return {
+    question: 'any_question',
+    answers: [
+      {
+        image: 'any_image',
+        answer: 'any_answer'
+      },
+      {
+        answer: 'any_answer'
+      }
+    ],
+    date: new Date()
+  }
+}
 
 function makeFakeSurvey (): any {
   return {
@@ -69,5 +102,13 @@ function makeFakeSurvey (): any {
         answer: 'Answer 2'
       }
     ]
+  }
+}
+
+function makeFakeAccount (): any {
+  return {
+    name: 'any_name',
+    email: 'any_email@mail.com',
+    password: 'any_password'
   }
 }
