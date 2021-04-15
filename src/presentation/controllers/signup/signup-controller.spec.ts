@@ -1,7 +1,7 @@
 import { MissingParamError } from '../../errors'
 import { badRequest, ok, serverError } from '../../helpers/http/http-helper'
 import { SignUpController } from './signup-controller'
-import { AccountModel, AddAccount, AddAccountModel, HttpRequest, Validation } from './signup-controller-protocols'
+import { AccountModel, AddAccount, AddAccountModel, Authentication, AuthenticationDataModel, HttpRequest, Validation } from './signup-controller-protocols'
 
 describe('Sign Up Controller', () => {
   test('should call Validations with correct value', async () => {
@@ -47,19 +47,42 @@ describe('Sign Up Controller', () => {
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(ok(makeFakeAccount()))
   })
+  test('should call Authentication with correct values', async () => {
+    const { sut, authenticationStub } = makeSut()
+    const httpRequest = makeFakeRequest()
+    const authSpy = jest.spyOn(authenticationStub, 'auth')
+    await sut.handle(httpRequest)
+    const { email, password } = httpRequest.body
+    expect(authSpy).toHaveBeenCalledWith({ email, password })
+  })
 })
 
 interface SutTypes {
   sut: SignUpController
   validationStub: Validation
   addAccountStub: AddAccount
+  authenticationStub: Authentication
 }
 
 function makeSut (): SutTypes {
   const validationStub = makeValidation()
   const addAccountStub = makeAddAccount()
-  const sut = new SignUpController(validationStub, addAccountStub)
-  return { sut, addAccountStub, validationStub }
+  const authenticationStub = makeAuthentication()
+  const sut = new SignUpController(validationStub, addAccountStub, authenticationStub)
+  return { sut, addAccountStub, validationStub, authenticationStub }
+}
+
+function makeAuthentication (): Authentication {
+  class AuthenticationStub implements Authentication {
+    async auth (_authenticationData: AuthenticationDataModel): Promise<string> {
+      return await Promise.resolve(makeFakeToken())
+    }
+  }
+  return new AuthenticationStub()
+}
+
+function makeFakeToken (): string {
+  return 'any_token'
 }
 
 function makeValidation (): Validation {
