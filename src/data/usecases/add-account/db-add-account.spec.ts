@@ -1,3 +1,4 @@
+import { LoadAccountByEmailRepository } from '../authentication/db-authentication-protocols'
 import { DbAddAccount } from './db-add-account'
 import { AddAccountRepository, AddAccountModel, AccountModel, Hasher } from './db-add-account-protocols'
 
@@ -35,19 +36,28 @@ describe('DbAddAccount Usecase', () => {
     const account = await sut.add(makeFakeAccountData())
     expect(account).toEqual(makeFakeAccount())
   })
+  test('should call LoadAccountByEmailRepository with correct email', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    const loadSpy = jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail')
+    const accountData = makeFakeAccountData()
+    await sut.add(accountData)
+    expect(loadSpy).toHaveBeenCalledWith(accountData.email)
+  })
 })
 
 interface SutTypes {
   sut: DbAddAccount
   hasherStub: Hasher
   addAccountRepositoryStub: AddAccountRepository
+  loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
 }
 
 function makeSut (): SutTypes {
   const hasherStub = makeHasher()
   const addAccountRepositoryStub = makeAddAccountRepository()
-  const sut = new DbAddAccount(hasherStub, addAccountRepositoryStub)
-  return { sut, hasherStub, addAccountRepositoryStub }
+  const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepository()
+  const sut = new DbAddAccount(hasherStub, addAccountRepositoryStub, loadAccountByEmailRepositoryStub)
+  return { sut, hasherStub, addAccountRepositoryStub, loadAccountByEmailRepositoryStub }
 }
 
 function makeHasher (): Hasher {
@@ -68,7 +78,16 @@ function makeAddAccountRepository (): AddAccountRepository {
   return new AddAccountRepositoryStub()
 }
 
-const ANY_EMAIL = 'any_email'
+function makeLoadAccountByEmailRepository (): LoadAccountByEmailRepository {
+  class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
+    async loadByEmail (_email: string): Promise<AccountModel> {
+      return await Promise.resolve(makeFakeAccount())
+    }
+  }
+  return new LoadAccountByEmailRepositoryStub()
+}
+
+const ANY_EMAIL = 'any_email@mail.com'
 const ANY_PASSWORD = 'any_password'
 const ANY_NAME = 'any_name'
 const ANY_ID = 'any_id'
