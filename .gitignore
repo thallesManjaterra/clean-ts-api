@@ -6,4 +6,5 @@ data.json
 Session.vim
 api-data
 data
+!src/data
 .vscode
