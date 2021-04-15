@@ -5,6 +5,6 @@ import { makeBcrypAdpater } from '../../adapters/bcrypt-adapter-factory'
 
 export function makeDbAddAccount (): AddAccount {
   const accountMongoRepository = new AccountMongoRepository()
-  const dbAddAccount = new DbAddAccount(makeBcrypAdpater(), accountMongoRepository)
+  const dbAddAccount = new DbAddAccount(makeBcrypAdpater(), accountMongoRepository, accountMongoRepository)
   return dbAddAccount
 }
