@@ -3,9 +3,12 @@ import request from 'supertest'
 import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helper'
 import app from '../config/app'
 import { hash } from 'bcrypt'
+import { AccountModel } from '../../domain/models/account'
+import { AddAccountModel } from '../../domain/usecases/add-account'
+import { AuthenticationDataModel } from '../../domain/usecases/authentication'
 
+let accountCollection: Collection
 describe('Login Routes', () => {
-  let accountCollection: Collection
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
   })
@@ -20,46 +23,56 @@ describe('Login Routes', () => {
     test('should return an account on signup', async () => {
       await request(app)
         .post('/api/signup')
-        .send(makeFakeNewAccount())
+        .send(makeFakeNewAccountData())
         .expect(200)
-        .then(({ body: account }) => {
-          expect(account).toBeTruthy()
-          expect(account.id).toBeTruthy()
-          expect(account.password).toBeTruthy()
-          expect(account.password).not.toEqual(makeFakeNewAccount().password)
-          expect(account.email).toBe(makeFakeNewAccount().email)
-          expect(account.name).toBe(makeFakeNewAccount().name)
-        })
     })
   })
   describe('POST /login', () => {
     test('should return 200 on login', async () => {
-      const salt = 12
-      const hashedPassword = await hash('any_password', salt)
-      await accountCollection.insertOne({
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: hashedPassword
-      })
+      await insertFakeAccount()
       await request(app)
         .post('/api/login')
-        .send({
-          email: 'any_email@mail.com',
-          password: 'any_password'
-        })
+        .send(makeFakeLoginData())
         .expect(200)
     })
     test('should return 401 on login', async () => {
       await request(app)
         .post('/api/login')
-        .send({
-          email: 'any_email@mail.com',
-          password: 'any_password'
-        })
+        .send(makeFakeLoginData())
         .expect(401)
     })
   })
 })
+
+const ANY_EMAIL = 'any_email@mail.com'
+const ANY_PASSWORD = 'any_password'
+const ANY_NAME = 'any_name'
+
+function makeFakeLoginData (): AuthenticationDataModel {
+  return {
+    email: ANY_EMAIL,
+    password: ANY_PASSWORD
+  }
+}
+
+async function insertFakeAccount (): Promise<AccountModel> {
+  const { ops: [account] } = await accountCollection.insertOne(await makeFakeAccountData())
+  return MongoHelper.formatId(account)
+}
+
+async function makeFakeAccountData (): Promise<AddAccountModel> {
+  return {
+    name: ANY_NAME,
+    email: ANY_EMAIL,
+    password: await hashPassword(ANY_PASSWORD)
+  }
+}
+
+async function hashPassword (password: string): Promise<string> {
+  const salt = 12
+  const hashedPassword = await hash(ANY_PASSWORD, salt)
+  return hashedPassword
+}
 
 interface NewAccount {
   name: string
@@ -68,11 +81,11 @@ interface NewAccount {
   passwordConfirmation: string
 }
 
-function makeFakeNewAccount (): NewAccount {
+function makeFakeNewAccountData (): NewAccount {
   return {
-    name: 'any_name',
-    email: 'any_email@mail.com',
-    password: 'any_password',
-    passwordConfirmation: 'any_password'
+    name: ANY_NAME,
+    email: ANY_EMAIL,
+    password: ANY_PASSWORD,
+    passwordConfirmation: ANY_PASSWORD
   }
 }

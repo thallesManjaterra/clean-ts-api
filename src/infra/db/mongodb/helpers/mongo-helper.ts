@@ -21,7 +21,9 @@ export const MongoHelper = {
     return this.client.db().collection(collectionName)
   },
   formatId (data: any) {
-    const { _id: id, ...dataWithoutId } = data
+    const { _id, ...dataWithoutId } = data
+    const id = _id
+    delete data._id
     return { id, ...dataWithoutId }
   }
 }

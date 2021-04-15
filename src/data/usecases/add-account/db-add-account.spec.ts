@@ -14,8 +14,7 @@ describe('DbAddAccount Usecase', () => {
     jest
       .spyOn(hasherStub, 'hash')
       .mockRejectedValueOnce(new Error())
-    const promise = sut.add(makeFakeAccountData())
-    await expect(promise).rejects.toThrow()
+    await expect(sut.add).rejects.toThrow()
   })
   test('should call AddAccountRepository with correct values', async () => {
     const { sut, addAccountRepositoryStub } = makeSut()
@@ -29,8 +28,7 @@ describe('DbAddAccount Usecase', () => {
     jest
       .spyOn(addAccountRepositoryStub, 'add')
       .mockRejectedValueOnce(new Error())
-    const promise = sut.add(makeFakeAccountData())
-    await expect(promise).rejects.toThrow()
+    await expect(sut.add).rejects.toThrow()
   })
   test('should return an account on success', async () => {
     const { sut } = makeSut()
@@ -61,10 +59,6 @@ function makeHasher (): Hasher {
   return new HasherStub()
 }
 
-function makeFakeHash (): string {
-  return 'any_hash'
-}
-
 function makeAddAccountRepository (): AddAccountRepository {
   class AddAccountRepositoryStub implements AddAccountRepository {
     async add (_accountData: AddAccountModel): Promise<AccountModel> {
@@ -74,19 +68,28 @@ function makeAddAccountRepository (): AddAccountRepository {
   return new AddAccountRepositoryStub()
 }
 
+const ANY_EMAIL = 'any_email'
+const ANY_PASSWORD = 'any_password'
+const ANY_NAME = 'any_name'
+const ANY_ID = 'any_id'
+const ANY_HASH = 'any_hash'
+
 function makeFakeAccount (): AccountModel {
   return {
-    id: 'any_id',
-    name: 'any_name',
-    email: 'any_email@mail.com',
+    id: ANY_ID,
+    name: ANY_NAME,
+    email: ANY_EMAIL,
     password: makeFakeHash()
   }
+}
+function makeFakeHash (): string {
+  return ANY_HASH
 }
 
 function makeFakeAccountData (): AddAccountModel {
   return {
-    name: 'any_name',
-    email: 'any_email@mail.com',
-    password: 'any_password'
+    name: ANY_NAME,
+    email: ANY_EMAIL,
+    password: ANY_PASSWORD
   }
 }
