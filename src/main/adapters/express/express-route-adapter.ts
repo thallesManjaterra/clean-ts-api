@@ -13,7 +13,7 @@ export function adaptRoute (controller: Controller): ExpressRouteHandler {
         res
           .status(statusCode)
           .json(
-            statusCode === 200
+            statusCode >= 200 && statusCode < 300
               ? body
               : { error: body.message }
           )
