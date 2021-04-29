@@ -1,8 +1,7 @@
-import { AccountModel } from '../../domain/models/account'
 import { AccessDeniedError } from '../errors'
 import { forbidden } from '../helpers/http/http-helper'
 import { AuthMiddleware } from './auth-middleware'
-import { LoadAccountByToken } from './auth-middleware-protocols'
+import { HttpRequest, LoadAccountByToken, AccountModel } from './auth-middleware-protocols'
 
 describe('Auth Middleware', () => {
   test('should return 403 if no x-access-token exists in request headers', async () => {
@@ -14,13 +13,9 @@ describe('Auth Middleware', () => {
   test('should call LoadAccountByToken with correct accessToken', async () => {
     const { sut, loadAccountByTokenStub } = makeSut()
     const loadSpy = jest.spyOn(loadAccountByTokenStub, 'load')
-    const httpRequest = {
-      headers: {
-        'x-access-token': 'any_token'
-      }
-    }
+    const httpRequest = makeFakeRequest()
     await sut.handle(httpRequest)
-    expect(loadSpy).toHaveBeenCalledWith('any_token')
+    expect(loadSpy).toHaveBeenCalledWith(httpRequest.headers['x-access-token'])
   })
 })
 
@@ -50,5 +45,13 @@ function makeFakeAccount (): AccountModel {
     name: 'any_name',
     email: 'any_email@mail.com',
     password: 'hashed_password'
+  }
+}
+
+function makeFakeRequest (): HttpRequest {
+  return {
+    headers: {
+      'x-access-token': 'any_token'
+    }
   }
 }
