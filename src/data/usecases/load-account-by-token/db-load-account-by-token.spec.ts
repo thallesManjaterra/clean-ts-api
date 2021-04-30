@@ -20,6 +20,12 @@ describe('DbLoadAccountByToken Usecase', () => {
     await sut.load('any_token', 'admin')
     expect(loadByTokenSpy).toHaveBeenCalledWith('any_token', 'admin')
   })
+  test('should return null if LoadAccountByTokenRepository returns null', async () => {
+    const { sut, loadAccountByTokenRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByTokenRepositoryStub, 'loadByToken').mockResolvedValueOnce(null)
+    const account = await sut.load('any_token', 'admin')
+    expect(account).toBeNull()
+  })
 })
 
 interface SutTypes {
