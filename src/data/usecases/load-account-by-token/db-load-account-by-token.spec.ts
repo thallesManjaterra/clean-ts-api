@@ -14,6 +14,13 @@ describe('DbLoadAccountByToken Usecase', () => {
     const account = await sut.load('any_token', 'admin')
     expect(account).toBeNull()
   })
+  test('should throw if Decrypter throws', async () => {
+    const { sut, decrypterStub } = makeSut()
+    jest
+      .spyOn(decrypterStub, 'decrypt')
+      .mockImplementationOnce(() => { throw new Error() })
+    await expect(sut.load).rejects.toThrow()
+  })
   test('should call LoadAccountByTokenRepository with correct values', async () => {
     const { sut, loadAccountByTokenRepositoryStub } = makeSut()
     const loadByTokenSpy = jest.spyOn(loadAccountByTokenRepositoryStub, 'loadByToken')
@@ -25,6 +32,13 @@ describe('DbLoadAccountByToken Usecase', () => {
     jest.spyOn(loadAccountByTokenRepositoryStub, 'loadByToken').mockResolvedValueOnce(null)
     const account = await sut.load('any_token', 'admin')
     expect(account).toBeNull()
+  })
+  test('should throw if LoadAccountByTokenRepository throws', async () => {
+    const { sut, loadAccountByTokenRepositoryStub } = makeSut()
+    jest
+      .spyOn(loadAccountByTokenRepositoryStub, 'loadByToken')
+      .mockRejectedValueOnce(new Error())
+    await expect(sut.load).rejects.toThrow()
   })
   test('should return an account on success', async () => {
     const { sut } = makeSut()
