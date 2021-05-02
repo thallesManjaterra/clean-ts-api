@@ -1,6 +1,5 @@
 import { Collection } from 'mongodb'
 import { AccountModel } from '../../../../domain/models/account'
-import { AddAccountModel } from '../../../../domain/usecases/add-account'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { AccountMongoRepository } from './account-mongo-repository'
 
@@ -29,10 +28,9 @@ describe('Account Mongo Repository', () => {
   describe('loadByEmail()', () => {
     test('should return an account on loadByEmail success', async () => {
       const sut = new AccountMongoRepository()
-      const fakeAccount = await insertFakeAccount(makeFakeAccountData)
+      const fakeAccount = await insertFakeAccount(makeFakeAccountData())
       const account = await sut.loadByEmail(fakeAccount.email)
       expect(account).toBeTruthy()
-      expect(account.id).toBeTruthy()
       expect(account).toMatchObject(fakeAccount)
     })
     test('should return null if LoadByEmail fails', async () => {
@@ -45,7 +43,7 @@ describe('Account Mongo Repository', () => {
   describe('updateAccessToken()', () => {
     test('should update account accessToken on updateAccessToken success', async () => {
       const sut = new AccountMongoRepository()
-      const fakeAccount = await insertFakeAccount(makeFakeAccountData)
+      const fakeAccount = await insertFakeAccount(makeFakeAccountData())
       expect(fakeAccount).not.toHaveProperty('accessToken')
       const { id } = fakeAccount
       await sut.updateAccessToken(id, 'any_token')
@@ -58,34 +56,38 @@ describe('Account Mongo Repository', () => {
   describe('loadByToken()', () => {
     test('should return an account on loadByToken without role', async () => {
       const sut = new AccountMongoRepository()
-      const fakeAccount = await insertFakeAccount(
-        makeFakeAccountDataWithAccessToken
-      )
+      const fakeAccount = makeFakeAccountData()
+      fakeAccount.token = 'any_token'
+      await insertFakeAccount(fakeAccount)
       const account = await sut.loadByToken(fakeAccount.accessToken)
       expect(account).toBeTruthy()
       expect(account).toMatchObject(fakeAccount)
     })
+    test('should return an account on loadByToken with role', async () => {
+      const sut = new AccountMongoRepository()
+      const fakeAccountData = makeFakeAccountData()
+      fakeAccountData.acccesToken = 'any_token'
+      fakeAccountData.role = 'admin'
+      await insertFakeAccount(fakeAccountData)
+      const account = await sut.loadByToken(
+        fakeAccountData.accessToken,
+        fakeAccountData.role
+      )
+      expect(account).toBeTruthy()
+      expect(account).toMatchObject(fakeAccountData)
+    })
   })
 })
 
-async function insertFakeAccount (makeAccountData): Promise<AccountModel> {
-  const {
-    ops: [account]
-  } = await accountCollection.insertOne(makeAccountData())
+async function insertFakeAccount (fakeAccountData: any): Promise<AccountModel> {
+  const { ops: [account] } = await accountCollection.insertOne(fakeAccountData)
   return MongoHelper.formatId(account)
 }
 
-function makeFakeAccountData (): AddAccountModel {
+function makeFakeAccountData (): any {
   return {
     name: 'any_name',
     email: 'any_email@mail.com',
     password: 'hashed_password'
-  }
-}
-
-function makeFakeAccountDataWithAccessToken (): any {
-  return {
-    ...makeFakeAccountData(),
-    accessToken: 'any_token'
   }
 }
