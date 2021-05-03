@@ -2,14 +2,22 @@ import { badRequest, noContent, serverError } from '../../../helpers/http/http-h
 import { Validation } from '../../../protocols'
 import { AddSurveyController } from './add-survey-controller'
 import { AddSurvey, AddSurveyModel, HttpRequest } from './add-survey-protocols'
+import mockDate from 'mockdate'
 
 describe('AddsurveyController', () => {
+  beforeAll(() => {
+    mockDate.set(new Date())
+  })
+  afterAll(() => {
+    mockDate.reset()
+  })
   test('should call Validation with correct values', async () => {
     const { sut, validationStub } = makeSut()
     const validateSpy = jest.spyOn(validationStub, 'validate')
     const httpRequest = makeFakeRequest()
     await sut.handle(httpRequest)
-    expect(validateSpy).toHaveBeenCalledWith(httpRequest.body)
+    const { question, answers } = httpRequest.body
+    expect(validateSpy).toHaveBeenCalledWith({ question, answers, date: new Date() })
   })
   test('should return 400 if Validation fails', async () => {
     const { sut, validationStub } = makeSut()
@@ -75,7 +83,8 @@ function makeFakeRequest (): HttpRequest {
       answers: [{
         image: 'any_image',
         answer: 'any_answer'
-      }]
+      }],
+      date: new Date()
     }
   }
 }
