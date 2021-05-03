@@ -64,6 +64,5 @@ function makeFakeSurveys (): SurveyModel[] {
       answer: 'another_answer'
     }],
     date: new Date()
-
   }]
 }

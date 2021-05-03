@@ -5,6 +5,7 @@ import app from '../config/app'
 import { AccountModel } from '../../domain/models/account'
 import { sign } from 'jsonwebtoken'
 import env from '../config/env'
+import { SurveyModel } from '../../domain/models/survey'
 
 let surveyCollection: Collection
 let accountCollection: Collection
@@ -56,6 +57,16 @@ describe('Survey Routes', () => {
         .set('x-access-token', accessToken)
         .expect(204)
     })
+    test('should return 200 on load surveys with valid accessToken', async () => {
+      const account = await insertFakeAccount(makeFakeAccountData())
+      const accessToken = sign({ id: account.id }, env.jwtSecretKey)
+      await updateAccountAccessToken(account.id, accessToken)
+      await insertFakeSurveys()
+      await request(app)
+        .get('/api/surveys')
+        .set('x-access-token', accessToken)
+        .expect(200)
+    })
   })
 })
 
@@ -69,6 +80,10 @@ async function updateAccountAccessToken (accountId: string, accessToken: string)
 async function insertFakeAccount (accountData: any): Promise<AccountModel> {
   const { ops: [account] } = await accountCollection.insertOne(accountData)
   return MongoHelper.formatId(account)
+}
+
+async function insertFakeSurveys (): Promise<void> {
+  await surveyCollection.insertMany(makeFakeSurveys())
 }
 
 function makeFakeAccountData (): any {
@@ -92,4 +107,24 @@ function makeFakeSurveyData (): any {
       }
     ]
   }
+}
+
+function makeFakeSurveys (): SurveyModel[] {
+  return [{
+    id: 'any_id',
+    question: 'any_question',
+    answers: [{
+      image: 'any_image',
+      answer: 'any_answer'
+    }],
+    date: new Date()
+  }, {
+    id: 'another_id',
+    question: 'another_question',
+    answers: [{
+      image: 'another_image',
+      answer: 'another_answer'
+    }],
+    date: new Date()
+  }]
 }
