@@ -4,7 +4,7 @@ import { MongoHelper } from '../helpers/mongo-helper'
 import { SurveyMongoRepository } from './survey-mongo-repository'
 
 let surveyCollection: Collection
-describe('Account Mongo Repository', () => {
+describe('Survey Mongo Repository', () => {
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
   })
@@ -15,14 +15,16 @@ describe('Account Mongo Repository', () => {
   afterAll(async () => {
     await MongoHelper.disconnect()
   })
-  test('should add a new survey on add success', async () => {
-    const sut = new SurveyMongoRepository()
-    const surveyData = makeFakeSurveyData()
-    await sut.add(surveyData)
-    const countSurveys = await surveyCollection.countDocuments()
-    expect(countSurveys).toBe(1)
-    const survey = await surveyCollection.findOne({ question: surveyData.question })
-    expect(survey).toBeTruthy()
+  describe('add()', () => {
+    test('should add a new survey on add success', async () => {
+      const sut = new SurveyMongoRepository()
+      const surveyData = makeFakeSurveyData()
+      await sut.add(surveyData)
+      const countSurveys = await surveyCollection.countDocuments()
+      expect(countSurveys).toBe(1)
+      const survey = await surveyCollection.findOne({ question: surveyData.question })
+      expect(survey).toBeTruthy()
+    })
   })
 })
 
@@ -36,6 +38,7 @@ function makeFakeSurveyData (): AddSurveyModel {
       }, {
         answer: 'another_answer'
       }
-    ]
+    ],
+    date: new Date()
   }
 }
