@@ -33,7 +33,7 @@ describe('Survey Routes', () => {
       const accountData = makeFakeAccountData()
       accountData.role = 'admin'
       const account = await insertFakeAccount(accountData)
-      const accessToken = sign({ id: account.id }, env.jwtSecretKey)
+      const accessToken = makeAccessToken(account.id)
       await updateAccountAccessToken(account.id, accessToken)
       await request(app)
         .post('/api/surveys')
@@ -59,7 +59,7 @@ describe('Survey Routes', () => {
     })
     test('should return 200 on load surveys with valid accessToken', async () => {
       const account = await insertFakeAccount(makeFakeAccountData())
-      const accessToken = sign({ id: account.id }, env.jwtSecretKey)
+      const accessToken = makeAccessToken(account.id)
       await updateAccountAccessToken(account.id, accessToken)
       await insertFakeSurveys()
       await request(app)
@@ -69,6 +69,11 @@ describe('Survey Routes', () => {
     })
   })
 })
+
+function makeAccessToken (accountId: string): string {
+  const accessToken = sign({ id: accountId }, env.jwtSecretKey)
+  return accessToken
+}
 
 async function updateAccountAccessToken (accountId: string, accessToken: string): Promise<void> {
   await accountCollection.updateOne(
