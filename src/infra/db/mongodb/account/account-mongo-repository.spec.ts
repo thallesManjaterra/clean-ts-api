@@ -62,18 +62,23 @@ describe('Account Mongo Repository', () => {
       expect(account).toBeTruthy()
       expect(account).toMatchObject(fakeAccount)
     })
-    test('should return an account on loadByToken with role', async () => {
+    test('should return an account on loadByToken with admin role', async () => {
       const sut = new AccountMongoRepository()
-      const fakeAccountData = makeFakeAccountData()
-      fakeAccountData.acccesToken = 'any_token'
-      fakeAccountData.role = 'admin'
-      await insertFakeAccount(fakeAccountData)
-      const account = await sut.loadByToken(
-        fakeAccountData.accessToken,
-        fakeAccountData.role
-      )
+      const accountData = makeFakeAccountData()
+      accountData.accessToken = 'any_token'
+      accountData.role = 'admin'
+      await insertFakeAccount(accountData)
+      const account = await sut.loadByToken('any_token', 'admin')
       expect(account).toBeTruthy()
-      expect(account).toMatchObject(fakeAccountData)
+    })
+    test('should return an account on loadByToken if user is admin', async () => {
+      const sut = new AccountMongoRepository()
+      const accountData = makeFakeAccountData()
+      accountData.accessToken = 'any_token'
+      accountData.role = 'admin'
+      await insertFakeAccount(accountData)
+      const account = await sut.loadByToken('any_token')
+      expect(account).toBeTruthy()
     })
     test('should return null if loadByToken fails', async () => {
       const sut = new AccountMongoRepository()
