@@ -16,7 +16,7 @@ describe('Survey Mongo Repository', () => {
     await MongoHelper.disconnect()
   })
   describe('add()', () => {
-    test('should add a new survey on add success', async () => {
+    test('should add a new survey', async () => {
       const sut = new SurveyMongoRepository()
       const surveyData = makeFakeSurveyData()
       await sut.add(surveyData)
@@ -24,6 +24,17 @@ describe('Survey Mongo Repository', () => {
       expect(countSurveys).toBe(1)
       const survey = await surveyCollection.findOne({ question: surveyData.question })
       expect(survey).toBeTruthy()
+    })
+  })
+  describe('loadAll()', () => {
+    test('should load all surveys', async () => {
+      const sut = new SurveyMongoRepository()
+      await surveyCollection.insertMany([
+        makeFakeSurveyData(),
+        makeFakeSurveyData()
+      ])
+      const surveys = await sut.loadAll()
+      expect(surveys.length).toBe(2)
     })
   })
 })
