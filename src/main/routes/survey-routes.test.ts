@@ -33,10 +33,7 @@ describe('Survey Routes', () => {
       accountData.role = 'admin'
       const account = await insertFakeAccount(accountData)
       const accessToken = sign({ id: account.id }, env.jwtSecretKey)
-      await accountCollection.updateOne(
-        { _id: account.id },
-        { $set: { accessToken } }
-      )
+      await updateAccountAccessToken(account.id, accessToken)
       await request(app)
         .post('/api/surveys')
         .set('x-access-token', accessToken)
@@ -50,8 +47,24 @@ describe('Survey Routes', () => {
         .get('/api/surveys')
         .expect(403)
     })
+    test('should return 204 on load empty surveys list with valid accessToken', async () => {
+      const account = await insertFakeAccount(makeFakeAccountData())
+      const accessToken = sign({ id: account.id }, env.jwtSecretKey)
+      await updateAccountAccessToken(account.id, accessToken)
+      await request(app)
+        .get('/api/surveys')
+        .set('x-access-token', accessToken)
+        .expect(204)
+    })
   })
 })
+
+async function updateAccountAccessToken (accountId: string, accessToken: string): Promise<void> {
+  await accountCollection.updateOne(
+    { _id: accountId },
+    { $set: { accessToken } }
+  )
+}
 
 async function insertFakeAccount (accountData: any): Promise<AccountModel> {
   const { ops: [account] } = await accountCollection.insertOne(accountData)
