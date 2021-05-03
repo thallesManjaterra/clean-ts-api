@@ -1,12 +1,24 @@
 import { LoadSurveysRepository, SurveyModel } from './db-load-surveys-protocols'
 import { DbLoadSurveys } from './db-load-surveys'
+import mockDate from 'mockdate'
 
 describe('DbLoadSurveys Usecase', () => {
+  beforeAll(() => {
+    mockDate.set(new Date())
+  })
+  afterAll(() => {
+    mockDate.reset()
+  })
   test('should call LoadSurveysRepository', async () => {
     const { sut, loadSurveysRepositoryStub } = makeSut()
     const loadAllSpy = jest.spyOn(loadSurveysRepositoryStub, 'loadAll')
     await sut.load()
     expect(loadAllSpy).toHaveBeenCalled()
+  })
+  test('should return a list of surveys on success', async () => {
+    const { sut } = makeSut()
+    const surveys = await sut.load()
+    expect(surveys).toEqual(makeFakeSurveys())
   })
 })
 
