@@ -1,5 +1,5 @@
-import { MissingParamError } from '../../../errors'
-import { serverError, badRequest, unauthorized, ok } from '../../../helpers/http/http-helper'
+import { MissingParamError } from '@/presentation/errors'
+import { serverError, badRequest, unauthorized, ok } from '@/presentation/helpers/http/http-helper'
 import { LoginController } from './login-controller'
 import { Authentication, AuthenticationDataModel, HttpRequest, Validation } from './login-controller-protocols'
 

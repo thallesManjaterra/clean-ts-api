@@ -1,5 +1,5 @@
+import { Controller, HttpRequest, HttpResponse } from '@/presentation/protocols'
 import { Request, Response } from 'express'
-import { Controller, HttpRequest, HttpResponse } from '../../presentation/protocols'
 
 type ExpressRouteHandler = (req: Request, res: Response) => void
 

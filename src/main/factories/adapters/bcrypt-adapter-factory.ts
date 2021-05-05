@@ -1,4 +1,4 @@
-import { BcryptAdapter } from '../../../infra/cryptography/bcrypt-adapter/bcrypt-adapter'
+import { BcryptAdapter } from '@/infra/cryptography/bcrypt-adapter/bcrypt-adapter'
 
 export function makeBcrypAdpater (): BcryptAdapter {
   const salt = 12

@@ -1,8 +1,8 @@
-import { DbAuthentication } from '../../../../../data/usecases/account/authentication/db-authentication'
-import { Authentication } from '../../../../../domain/usecases/authentication'
-import { AccountMongoRepository } from '../../../../../infra/db/mongodb/account/account-mongo-repository'
-import { makeBcrypAdpater } from '../../../adapters/bcrypt-adapter-factory'
-import { makeJwtAdapter } from '../../../adapters/jwt-adapter-factory'
+import { DbAuthentication } from '@/data/usecases/account/authentication/db-authentication'
+import { Authentication } from '@/domain/usecases/authentication'
+import { AccountMongoRepository } from '@/infra/db/mongodb/account/account-mongo-repository'
+import { makeBcrypAdpater } from '@/main/factories/adapters/bcrypt-adapter-factory'
+import { makeJwtAdapter } from '@/main/factories/adapters/jwt-adapter-factory'
 
 export function makeDbAuthentication (): Authentication {
   const accountMongoRepository = new AccountMongoRepository()

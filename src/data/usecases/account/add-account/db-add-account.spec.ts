@@ -1,6 +1,5 @@
-import { LoadAccountByEmailRepository } from '../authentication/db-authentication-protocols'
 import { DbAddAccount } from './db-add-account'
-import { AddAccountRepository, AddAccountModel, AccountModel, Hasher } from './db-add-account-protocols'
+import { AddAccountRepository, AddAccountModel, AccountModel, Hasher, LoadAccountByEmailRepository } from './db-add-account-protocols'
 
 describe('DbAddAccount Usecase', () => {
   test('should call Hasher with correct password', async () => {

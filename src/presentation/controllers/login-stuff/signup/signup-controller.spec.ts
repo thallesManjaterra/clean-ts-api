@@ -1,5 +1,5 @@
-import { MissingParamError, EmailAlreadyInUseError } from '../../../errors'
-import { serverError, badRequest, forbidden, ok } from '../../../helpers/http/http-helper'
+import { MissingParamError, EmailAlreadyInUseError } from '@/presentation/errors'
+import { serverError, badRequest, forbidden, ok } from '@/presentation/helpers/http/http-helper'
 import { SignUpController } from './signup-controller'
 import { AccountModel, AddAccount, AddAccountModel, Authentication, AuthenticationDataModel, HttpRequest, Validation } from './signup-controller-protocols'
 

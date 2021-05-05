@@ -1,5 +1,5 @@
+import { AccountModel } from '@/domain/models/account'
 import { Collection } from 'mongodb'
-import { AccountModel } from '../../../../domain/models/account'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { AccountMongoRepository } from './account-mongo-repository'
 

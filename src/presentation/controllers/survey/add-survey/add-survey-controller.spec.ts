@@ -1,8 +1,7 @@
-import { badRequest, noContent, serverError } from '../../../helpers/http/http-helper'
-import { Validation } from '../../../protocols'
-import { AddSurveyController } from './add-survey-controller'
-import { AddSurvey, AddSurveyModel, HttpRequest } from './add-survey-protocols'
+import { badRequest, noContent, serverError } from '@/presentation/helpers/http/http-helper'
 import mockDate from 'mockdate'
+import { AddSurveyController } from './add-survey-controller'
+import { AddSurvey, AddSurveyModel, HttpRequest, Validation } from './add-survey-protocols'
 
 describe('AddsurveyController', () => {
   beforeAll(() => {
