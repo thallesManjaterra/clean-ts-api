@@ -12,8 +12,15 @@ describe('DbLoadSurveys Usecase', () => {
   test('should call LoadSurveyByIdRepository with correct id', async () => {
     const { sut, loadSurveyByIdRepositoryStub } = makeSut()
     const loadByIdSpy = jest.spyOn(loadSurveyByIdRepositoryStub, 'loadById')
-    await sut.loadById('any_survey_id')
-    expect(loadByIdSpy).toHaveBeenCalledWith('any_survey_id')
+    const fakeSurvey = makeFakeSurvey()
+    await sut.loadById(fakeSurvey.id)
+    expect(loadByIdSpy).toHaveBeenCalledWith(fakeSurvey.id)
+  })
+  test('should return a survey on success', async () => {
+    const { sut } = makeSut()
+    const fakeSurvey = makeFakeSurvey()
+    const survey = await sut.loadById(fakeSurvey.id)
+    expect(survey).toEqual(fakeSurvey)
   })
 })
 
