@@ -1,6 +1,6 @@
 import { AccountModel } from '@/domain/models/account'
-import { AddAccountModel } from '@/domain/usecases/add-account'
-import { AuthenticationDataModel } from '@/domain/usecases/authentication'
+import { AddAccountModel } from '@/domain/usecases/account/add-account'
+import { AuthenticationDataModel } from '@/domain/usecases/account/authentication'
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper'
 import { hash } from 'bcrypt'
 import { Collection } from 'mongodb'
