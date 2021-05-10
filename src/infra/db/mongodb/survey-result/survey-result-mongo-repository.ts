@@ -6,7 +6,12 @@ import { MongoHelper } from '../helpers/mongo-helper'
 export class SurveyResultMongoRepository implements SaveSurveyResultRepository {
   async save (surveyResultData: SaveSurveyResultModel): Promise<SurveyResultModel> {
     const surveyResultCollection = await MongoHelper.getCollection('surveyResults')
-    const { ops: [surveyResult] } = await surveyResultCollection.insertOne(surveyResultData)
+    const { accountId, surveyId, answer, date } = surveyResultData
+    const { value: surveyResult } = await surveyResultCollection.findOneAndUpdate(
+      { accountId, surveyId },
+      { $set: { answer, date } },
+      { upsert: true, returnOriginal: false }
+    )
     return surveyResult && MongoHelper.formatId(surveyResult)
   }
 }
