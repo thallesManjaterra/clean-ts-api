@@ -14,6 +14,11 @@ describe('DbSaveSurveyResult Usecase', () => {
     jest.spyOn(saveSurveyResultRepositoryStub, 'save').mockRejectedValueOnce(new Error())
     await expect(sut.save).rejects.toThrow()
   })
+  test('should return a survey result on success', async () => {
+    const { sut } = makeSut()
+    const surveyResult = await sut.save(makeFakeSurveyResultData())
+    expect(surveyResult).toEqual(makeFakeSurveyResult())
+  })
 })
 
 interface SutTypes {
