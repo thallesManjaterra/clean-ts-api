@@ -1,5 +1,4 @@
 import { AccountModel } from '@/domain/models/account'
-import { SurveyModel } from '@/domain/models/survey'
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper'
 import { sign } from 'jsonwebtoken'
 import { Collection } from 'mongodb'
@@ -88,7 +87,10 @@ async function insertFakeAccount (accountData: any): Promise<AccountModel> {
 }
 
 async function insertFakeSurveys (): Promise<void> {
-  await surveyCollection.insertMany(makeFakeSurveys())
+  await surveyCollection.insertMany([
+    makeFakeSurveyData(),
+    makeFakeSurveyData()
+  ])
 }
 
 function makeFakeAccountData (): any {
@@ -101,35 +103,15 @@ function makeFakeAccountData (): any {
 
 function makeFakeSurveyData (): any {
   return {
-    question: 'Question 1',
+    question: 'any_question',
     answers: [
       {
-        answer: 'Answer 1',
+        answer: 'any_answer',
         image: 'http://image-name.com'
       },
       {
-        answer: 'Answer 2'
+        answer: 'another_answer'
       }
     ]
   }
-}
-
-function makeFakeSurveys (): SurveyModel[] {
-  return [{
-    id: 'any_id',
-    question: 'any_question',
-    answers: [{
-      image: 'any_image',
-      answer: 'any_answer'
-    }],
-    date: new Date()
-  }, {
-    id: 'another_id',
-    question: 'another_question',
-    answers: [{
-      image: 'another_image',
-      answer: 'another_answer'
-    }],
-    date: new Date()
-  }]
 }
