@@ -1,4 +1,4 @@
-import { AddSurveyModel } from '@/domain/usecases/survey/add-survey'
+import { AddSurveyParams } from '@/domain/usecases/survey/add-survey'
 import { Collection } from 'mongodb'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { SurveyMongoRepository } from './survey-mongo-repository'
@@ -57,7 +57,7 @@ describe('Survey Mongo Repository', () => {
   })
 })
 
-function makeFakeSurveyData (): AddSurveyModel {
+function makeFakeSurveyData (): AddSurveyParams {
   return {
     question: 'any_question',
     answers: [

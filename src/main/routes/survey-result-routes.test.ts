@@ -5,9 +5,9 @@ import env from '../config/env'
 import { AccountModel } from '@/domain/models/account'
 import { Collection } from 'mongodb'
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper'
-import { AddAccountModel } from '@/domain/usecases/account/add-account'
+import { AddAccountParams } from '@/domain/usecases/account/add-account'
 import { SurveyModel } from '@/domain/models/survey'
-import { AddSurveyModel } from '@/domain/usecases/survey/add-survey'
+import { AddSurveyParams } from '@/domain/usecases/survey/add-survey'
 
 let accountCollection: Collection,
   surveyCollection: Collection
@@ -62,7 +62,7 @@ async function insertFakeSurvey (): Promise<SurveyModel> {
   return MongoHelper.formatId(survey)
 }
 
-function makeFakeAccountData (): AddAccountModel {
+function makeFakeAccountData (): AddAccountParams {
   return {
     name: 'any_name',
     email: 'any_email@mail.com',
@@ -75,7 +75,7 @@ function makeAccessToken (accountId: string): string {
   return accessToken
 }
 
-function makeSurveyData (): AddSurveyModel {
+function makeSurveyData (): AddSurveyParams {
   return {
     question: 'any_question',
     answers: [

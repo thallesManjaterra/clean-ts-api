@@ -1,7 +1,7 @@
 import { MissingParamError } from '@/presentation/errors'
 import { serverError, badRequest, unauthorized, ok } from '@/presentation/helpers/http/http-helper'
 import { LoginController } from './login-controller'
-import { Authentication, AuthenticationDataModel, HttpRequest, Validation } from './login-controller-protocols'
+import { Authentication, AuthenticationParams, HttpRequest, Validation } from './login-controller-protocols'
 
 describe('Login Controller', () => {
   test('should call Validation with correct value', async () => {
@@ -85,7 +85,7 @@ function makeValidation (): Validation {
 
 function makeAuthentication (): Authentication {
   class AuthenticationStub implements Authentication {
-    async auth (_authenticationData: AuthenticationDataModel): Promise<string> {
+    async auth (_authenticationData: AuthenticationParams): Promise<string> {
       return await Promise.resolve(makeFakeToken())
     }
   }

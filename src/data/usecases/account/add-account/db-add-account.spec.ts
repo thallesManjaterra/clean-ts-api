@@ -1,5 +1,5 @@
 import { DbAddAccount } from './db-add-account'
-import { AddAccountRepository, AddAccountModel, AccountModel, Hasher, LoadAccountByEmailRepository } from './db-add-account-protocols'
+import { AddAccountRepository, AddAccountParams, AccountModel, Hasher, LoadAccountByEmailRepository } from './db-add-account-protocols'
 
 describe('DbAddAccount Usecase', () => {
   test('should call Hasher with correct password', async () => {
@@ -76,7 +76,7 @@ function makeHasher (): Hasher {
 
 function makeAddAccountRepository (): AddAccountRepository {
   class AddAccountRepositoryStub implements AddAccountRepository {
-    async add (_accountData: AddAccountModel): Promise<AccountModel> {
+    async add (_accountData: AddAccountParams): Promise<AccountModel> {
       return await Promise.resolve(makeFakeAccount())
     }
   }
@@ -110,7 +110,7 @@ function makeFakeHash (): string {
   return ANY_HASH
 }
 
-function makeFakeAccountData (): AddAccountModel {
+function makeFakeAccountData (): AddAccountParams {
   return {
     name: ANY_NAME,
     email: ANY_EMAIL,

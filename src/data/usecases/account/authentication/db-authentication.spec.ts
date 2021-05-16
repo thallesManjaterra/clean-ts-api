@@ -1,5 +1,5 @@
 import { DbAuthentication } from './db-authentication'
-import { AccountModel, AuthenticationDataModel, HashComparer, LoadAccountByEmailRepository, Encrypter, UpdateAccessTokenRepository } from './db-authentication-protocols'
+import { AccountModel, AuthenticationParams, HashComparer, LoadAccountByEmailRepository, Encrypter, UpdateAccessTokenRepository } from './db-authentication-protocols'
 
 describe('DbAuthentication Usecase', () => {
   test('should call LoadAccountByEmailRepository with correct email', async () => {
@@ -134,7 +134,7 @@ function makeUpdateAccessTokenRepository (): UpdateAccessTokenRepository {
   return new UpdateAccessTokenRepositoryStub()
 }
 
-function makeFakeAuthenticationData (): AuthenticationDataModel {
+function makeFakeAuthenticationData (): AuthenticationParams {
   return {
     email: 'any_email@mail.com',
     password: 'any_passsword'

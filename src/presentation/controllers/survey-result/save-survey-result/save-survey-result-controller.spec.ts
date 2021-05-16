@@ -3,7 +3,7 @@ import { HttpRequest } from '@/presentation/protocols'
 import { SaveSurveyResultController } from './save-survey-result-controller'
 import { InvalidParamError } from '@/presentation/errors'
 import { forbidden, ok, serverError } from '@/presentation/helpers/http/http-helper'
-import { SaveSurveyResult, SaveSurveyResultModel } from '@/domain/usecases/survey-result/save-survey-result'
+import { SaveSurveyResult, SaveSurveyResultParams } from '@/domain/usecases/survey-result/save-survey-result'
 import { SurveyResultModel } from '@/domain/models/survey-result'
 import mockDate from 'mockdate'
 
@@ -84,7 +84,7 @@ function makeSut (): SutTypes {
 
 function makeSaveSurveyResult (): SaveSurveyResult {
   class SaveSurveyResultStub implements SaveSurveyResult {
-    async save (surveyResultData: SaveSurveyResultModel): Promise<SurveyResultModel> {
+    async save (surveyResultData: SaveSurveyResultParams): Promise<SurveyResultModel> {
       return await Promise.resolve(makeFakeSurveyResult())
     }
   }

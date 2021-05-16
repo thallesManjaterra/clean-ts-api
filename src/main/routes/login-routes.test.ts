@@ -1,6 +1,6 @@
 import { AccountModel } from '@/domain/models/account'
-import { AddAccountModel } from '@/domain/usecases/account/add-account'
-import { AuthenticationDataModel } from '@/domain/usecases/account/authentication'
+import { AddAccountParams } from '@/domain/usecases/account/add-account'
+import { AuthenticationParams } from '@/domain/usecases/account/authentication'
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper'
 import { hash } from 'bcrypt'
 import { Collection } from 'mongodb'
@@ -48,7 +48,7 @@ const ANY_EMAIL = 'any_email@mail.com'
 const ANY_PASSWORD = 'any_password'
 const ANY_NAME = 'any_name'
 
-function makeFakeLoginData (): AuthenticationDataModel {
+function makeFakeLoginData (): AuthenticationParams {
   return {
     email: ANY_EMAIL,
     password: ANY_PASSWORD
@@ -60,7 +60,7 @@ async function insertFakeAccount (): Promise<AccountModel> {
   return MongoHelper.formatId(account)
 }
 
-async function makeFakeAccountData (): Promise<AddAccountModel> {
+async function makeFakeAccountData (): Promise<AddAccountParams> {
   return {
     name: ANY_NAME,
     email: ANY_EMAIL,

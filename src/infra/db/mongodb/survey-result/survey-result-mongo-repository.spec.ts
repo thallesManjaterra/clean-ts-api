@@ -1,9 +1,9 @@
-import { AddSurveyModel } from '@/domain/usecases/survey/add-survey'
+import { AddSurveyParams } from '@/domain/usecases/survey/add-survey'
 import { Collection } from 'mongodb'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { SurveyResultMongoRepository } from './survey-result-mongo-repository'
 import mockDate from 'mockdate'
-import { AddAccountModel } from '@/domain/usecases/account/add-account'
+import { AddAccountParams } from '@/domain/usecases/account/add-account'
 
 let surveyResultCollection: Collection,
   surveyCollection: Collection,
@@ -79,7 +79,7 @@ async function insert (collection: Collection, data: any): Promise<any> {
   return MongoHelper.formatId(document)
 }
 
-function makeFakeAccountData (): AddAccountModel {
+function makeFakeAccountData (): AddAccountParams {
   return {
     name: 'any_name',
     email: 'any_email@mail.com',
@@ -87,7 +87,7 @@ function makeFakeAccountData (): AddAccountModel {
   }
 }
 
-function makeFakeSurveyData (): AddSurveyModel {
+function makeFakeSurveyData (): AddSurveyParams {
   return {
     question: 'any_question',
     answers: [

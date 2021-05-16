@@ -1,7 +1,7 @@
 import { MissingParamError, EmailAlreadyInUseError } from '@/presentation/errors'
 import { serverError, badRequest, forbidden, ok } from '@/presentation/helpers/http/http-helper'
 import { SignUpController } from './signup-controller'
-import { AccountModel, AddAccount, AddAccountModel, Authentication, AuthenticationDataModel, HttpRequest, Validation } from './signup-controller-protocols'
+import { AccountModel, AddAccount, AddAccountParams, Authentication, AuthenticationParams, HttpRequest, Validation } from './signup-controller-protocols'
 
 describe('Sign Up Controller', () => {
   test('should call Validations with correct value', async () => {
@@ -89,7 +89,7 @@ function makeSut (): SutTypes {
 
 function makeAuthentication (): Authentication {
   class AuthenticationStub implements Authentication {
-    async auth (_authenticationData: AuthenticationDataModel): Promise<string> {
+    async auth (_authenticationData: AuthenticationParams): Promise<string> {
       return await Promise.resolve(makeFakeToken())
     }
   }
@@ -111,7 +111,7 @@ function makeValidation (): Validation {
 
 function makeAddAccount (): AddAccount {
   class AddAccountStub implements AddAccount {
-    async add (_accountData: AddAccountModel): Promise<AccountModel> {
+    async add (_accountData: AddAccountParams): Promise<AccountModel> {
       return await Promise.resolve(makeFakeAccount())
     }
   }

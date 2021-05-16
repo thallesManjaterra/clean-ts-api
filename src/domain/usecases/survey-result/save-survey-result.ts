@@ -1,6 +1,6 @@
 import { SurveyResultModel } from '../../models/survey-result'
 
-export interface SaveSurveyResultModel {
+export interface SaveSurveyResultParams {
   surveyId: string
   accountId: string
   answer: string
@@ -8,5 +8,5 @@ export interface SaveSurveyResultModel {
 }
 
 export interface SaveSurveyResult {
-  save: (surveyResultData: SaveSurveyResultModel) => Promise<SurveyResultModel>
+  save: (surveyResultData: SaveSurveyResultParams) => Promise<SurveyResultModel>
 }

@@ -1,11 +1,11 @@
 import { SurveyAnswerModel } from '@/domain/models/survey'
 
-export interface AddSurveyModel {
+export interface AddSurveyParams {
   question: string
   answers: SurveyAnswerModel[]
   date: Date
 }
 
 export interface AddSurvey {
-  add: (surveyData: AddSurveyModel) => Promise<void>
+  add: (surveyData: AddSurveyParams) => Promise<void>
 }
