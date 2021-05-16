@@ -6,7 +6,9 @@ type ExpressRouteHandler = (req: Request, res: Response) => void
 export function adaptRoute (controller: Controller): ExpressRouteHandler {
   return (req: Request, res: Response): void => {
     const httpRequest: HttpRequest = {
-      body: req.body
+      body: req.body,
+      params: req.params,
+      accountId: req.accountId
     }
     controller.handle(httpRequest)
       .then(({ statusCode, body }: HttpResponse) => {
