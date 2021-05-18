@@ -1,4 +1,5 @@
 import { EmailValidator } from '@/validation/protocols/email-validator'
+import { mockEmailValidator } from '@/validation/test'
 import { ValidationComposite, RequiredFieldValidation, CompareFieldsValidation, EmailValidation } from '@/validation/validators'
 import { makeSignUpValidation } from './signup-validation-factory'
 
@@ -10,7 +11,7 @@ describe('SignUp Validation', () => {
     const requiredFields = ['name', 'email', 'password', 'passwordConfirmation']
     const fieldsToCompare = ['password', 'passwordConfirmation']
     const emailField = 'email'
-    const emailValidatorStub = makeEmailValidator()
+    const emailValidatorStub = mockEmailValidator()
     expect(ValidationComposite).toHaveBeenCalledWith([
       ...makeRequiredFieldValidations(requiredFields),
       makeCompareFieldsValidation(fieldsToCompare),
@@ -29,13 +30,4 @@ function makeCompareFieldsValidation ([field, fieldToCompare]: string[]): Compar
 
 function makeEmailValidation (emailField: string, emailValidator: EmailValidator): EmailValidation {
   return new EmailValidation(emailField, emailValidator)
-}
-
-function makeEmailValidator (): EmailValidator {
-  class EmailValidatorStub implements EmailValidator {
-    isValid (_email: string): boolean {
-      return true
-    }
-  }
-  return new EmailValidatorStub()
 }

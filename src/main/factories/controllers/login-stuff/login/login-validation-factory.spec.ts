@@ -1,4 +1,5 @@
 import { EmailValidator } from '@/validation/protocols/email-validator'
+import { mockEmailValidator } from '@/validation/test'
 import { ValidationComposite, RequiredFieldValidation, EmailValidation } from '@/validation/validators'
 import { makeLoginValidation } from './login-validation-factory'
 
@@ -9,7 +10,7 @@ describe('Login Validation', () => {
     makeLoginValidation()
     const requiredFields = ['email', 'password']
     const emailField = 'email'
-    const emailValidatorStub = makeEmailValidator()
+    const emailValidatorStub = mockEmailValidator()
     expect(ValidationComposite).toHaveBeenCalledWith([
       ...makeRequiredFieldValidations(requiredFields),
       makeEmailValidation(emailField, emailValidatorStub)
@@ -23,13 +24,4 @@ function makeRequiredFieldValidations (requiredFields: string[]): RequiredFieldV
 
 function makeEmailValidation (emailField: string, emailValidator: EmailValidator): EmailValidation {
   return new EmailValidation(emailField, emailValidator)
-}
-
-function makeEmailValidator (): EmailValidator {
-  class EmailValidatorStub implements EmailValidator {
-    isValid (_email: string): boolean {
-      return true
-    }
-  }
-  return new EmailValidatorStub()
 }

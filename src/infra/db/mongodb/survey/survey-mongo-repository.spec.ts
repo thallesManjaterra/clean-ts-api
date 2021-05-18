@@ -1,8 +1,8 @@
-import { AddSurveyParams } from '@/domain/usecases/survey/add-survey'
 import { Collection } from 'mongodb'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { SurveyMongoRepository } from './survey-mongo-repository'
 import mockDate from 'mockdate'
+import { mockSurveyData } from '@/domain/test'
 
 let surveyCollection: Collection
 describe('Survey Mongo Repository', () => {
@@ -21,7 +21,7 @@ describe('Survey Mongo Repository', () => {
   describe('add()', () => {
     test('should add a new survey', async () => {
       const sut = new SurveyMongoRepository()
-      const surveyData = makeFakeSurveyData()
+      const surveyData = mockSurveyData()
       await sut.add(surveyData)
       const countSurveys = await surveyCollection.countDocuments()
       expect(countSurveys).toBe(1)
@@ -33,8 +33,8 @@ describe('Survey Mongo Repository', () => {
     test('should load all surveys', async () => {
       const sut = new SurveyMongoRepository()
       await surveyCollection.insertMany([
-        makeFakeSurveyData(),
-        makeFakeSurveyData()
+        mockSurveyData(),
+        mockSurveyData()
       ])
       const surveys = await sut.loadAll()
       expect(surveys.length).toBe(2)
@@ -48,26 +48,11 @@ describe('Survey Mongo Repository', () => {
   describe('loadById()', () => {
     test('should load survey by id', async () => {
       const sut = new SurveyMongoRepository()
-      const { ops: [{ _id }] } = await surveyCollection.insertOne(makeFakeSurveyData())
+      const { ops: [{ _id }] } = await surveyCollection.insertOne(mockSurveyData())
       const survey = await sut.loadById(_id)
       expect(survey).toBeTruthy()
       expect(survey.id).toBeTruthy()
-      expect(survey).toMatchObject(makeFakeSurveyData())
+      expect(survey).toMatchObject(mockSurveyData())
     })
   })
 })
-
-function makeFakeSurveyData (): AddSurveyParams {
-  return {
-    question: 'any_question',
-    answers: [
-      {
-        image: 'any_image',
-        answer: 'any_answer'
-      }, {
-        answer: 'another_answer'
-      }
-    ],
-    date: new Date()
-  }
-}

@@ -5,9 +5,9 @@ import env from '../config/env'
 import { AccountModel } from '@/domain/models/account'
 import { Collection } from 'mongodb'
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper'
-import { AddAccountParams } from '@/domain/usecases/account/add-account'
 import { SurveyModel } from '@/domain/models/survey'
 import { AddSurveyParams } from '@/domain/usecases/survey/add-survey'
+import { mockAddAccountParams } from '@/domain/test'
 
 let accountCollection: Collection,
   surveyCollection: Collection
@@ -53,21 +53,13 @@ async function updateAccountAccessToken (accountId: string, accessToken: string)
 }
 
 async function insertFakeAccount (): Promise<AccountModel> {
-  const { ops: [account] } = await accountCollection.insertOne(makeFakeAccountData())
+  const { ops: [account] } = await accountCollection.insertOne(mockAddAccountParams())
   return MongoHelper.formatId(account)
 }
 
 async function insertFakeSurvey (): Promise<SurveyModel> {
   const { ops: [survey] } = await surveyCollection.insertOne(makeSurveyData())
   return MongoHelper.formatId(survey)
-}
-
-function makeFakeAccountData (): AddAccountParams {
-  return {
-    name: 'any_name',
-    email: 'any_email@mail.com',
-    password: 'hashed_password'
-  }
 }
 
 function makeAccessToken (accountId: string): string {

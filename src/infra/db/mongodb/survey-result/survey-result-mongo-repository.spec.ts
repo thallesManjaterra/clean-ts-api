@@ -1,9 +1,8 @@
-import { AddSurveyParams } from '@/domain/usecases/survey/add-survey'
 import { Collection } from 'mongodb'
 import { MongoHelper } from '../helpers/mongo-helper'
 import { SurveyResultMongoRepository } from './survey-result-mongo-repository'
 import mockDate from 'mockdate'
-import { AddAccountParams } from '@/domain/usecases/account/add-account'
+import { mockAddAccountParams, mockSurveyData } from '@/domain/test'
 
 let surveyResultCollection: Collection,
   surveyCollection: Collection,
@@ -30,12 +29,12 @@ describe('Survey Mongo Repository', () => {
       const sut = new SurveyResultMongoRepository()
       const { id: accountId } = await insert(
         accountCollection,
-        makeFakeAccountData()
+        mockAddAccountParams()
       )
       const {
         id: surveyId,
         answers: [{ answer: firstAnswer }]
-      } = await insert(surveyCollection, makeFakeSurveyData())
+      } = await insert(surveyCollection, mockSurveyData())
       const surveyResult = await sut.save({
         accountId,
         surveyId,
@@ -49,12 +48,12 @@ describe('Survey Mongo Repository', () => {
     test('should update a survey result if its not new', async () => {
       const { id: accountId } = await insert(
         accountCollection,
-        makeFakeAccountData()
+        mockAddAccountParams()
       )
       const {
         id: surveyId,
         answers: [{ answer: firstAnswer }, { answer: secondAnswer }]
-      } = await insert(surveyCollection, makeFakeSurveyData())
+      } = await insert(surveyCollection, mockSurveyData())
       const surveyResult = await insert(surveyResultCollection, {
         accountId, surveyId, answer: firstAnswer, date: new Date()
       })
@@ -77,28 +76,4 @@ async function insert (collection: Collection, data: any): Promise<any> {
     ops: [document]
   } = await collection.insertOne(data)
   return MongoHelper.formatId(document)
-}
-
-function makeFakeAccountData (): AddAccountParams {
-  return {
-    name: 'any_name',
-    email: 'any_email@mail.com',
-    password: 'hashed_password'
-  }
-}
-
-function makeFakeSurveyData (): AddSurveyParams {
-  return {
-    question: 'any_question',
-    answers: [
-      {
-        image: 'any_image',
-        answer: 'any_answer'
-      },
-      {
-        answer: 'another_answer'
-      }
-    ],
-    date: new Date()
-  }
 }

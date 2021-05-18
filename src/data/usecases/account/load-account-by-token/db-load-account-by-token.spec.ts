@@ -1,5 +1,7 @@
-import { Decrypter, LoadAccountByTokenRepository, AccountModel } from './db-load-account-by-token-protocols'
+import { Decrypter, LoadAccountByTokenRepository } from './db-load-account-by-token-protocols'
 import { DbLoadAccountByToken } from './db-load-account-by-token'
+import { mockAccountModel } from '@/domain/test'
+import { mockDecrpyter, mockLoadAccountByTokenRepository } from '@/data/test'
 
 describe('DbLoadAccountByToken Usecase', () => {
   test('should call Decrypter with correct value', async () => {
@@ -43,7 +45,7 @@ describe('DbLoadAccountByToken Usecase', () => {
   test('should return an account on success', async () => {
     const { sut } = makeSut()
     const account = await sut.load('any_token', 'admin')
-    expect(account).toEqual(makeFakeAccount())
+    expect(account).toEqual(mockAccountModel())
   })
 })
 
@@ -54,35 +56,8 @@ interface SutTypes {
 }
 
 function makeSut (): SutTypes {
-  const decrypterStub = makeDecrypter()
-  const loadAccountByTokenRepositoryStub = makeLoadAccountByTokenRepository()
+  const decrypterStub = mockDecrpyter()
+  const loadAccountByTokenRepositoryStub = mockLoadAccountByTokenRepository()
   const sut = new DbLoadAccountByToken(decrypterStub, loadAccountByTokenRepositoryStub)
   return { sut, decrypterStub, loadAccountByTokenRepositoryStub }
-}
-
-function makeDecrypter (): Decrypter {
-  class DecrypterStub implements Decrypter {
-    decrypt (token: string): string {
-      return 'any_value'
-    }
-  }
-  return new DecrypterStub()
-}
-
-function makeLoadAccountByTokenRepository (): LoadAccountByTokenRepository {
-  class LoadAccountByTokenRepositoryStub implements LoadAccountByTokenRepository {
-    async loadByToken (token: string, role?: string): Promise<AccountModel> {
-      return await Promise.resolve(makeFakeAccount())
-    }
-  }
-  return new LoadAccountByTokenRepositoryStub()
-}
-
-function makeFakeAccount (): AccountModel {
-  return {
-    id: 'any_id',
-    name: 'any_name',
-    email: 'any_email@mail.com',
-    password: 'hashed_password'
-  }
 }

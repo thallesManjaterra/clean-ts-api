@@ -1,5 +1,5 @@
 import { AccountModel } from '@/domain/models/account'
-import { AddAccountParams } from '@/domain/usecases/account/add-account'
+import { mockAddAccountParams } from '@/domain/test'
 import { AuthenticationParams } from '@/domain/usecases/account/authentication'
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper'
 import { hash } from 'bcrypt'
@@ -23,7 +23,10 @@ describe('Login Routes', () => {
     test('should return an account on signup', async () => {
       await request(app)
         .post('/api/signup')
-        .send(makeFakeNewAccountData())
+        .send({
+          ...mockAddAccountParams(),
+          passwordConfirmation: mockAddAccountParams().password
+        })
         .expect(200)
     })
   })
@@ -46,7 +49,6 @@ describe('Login Routes', () => {
 
 const ANY_EMAIL = 'any_email@mail.com'
 const ANY_PASSWORD = 'any_password'
-const ANY_NAME = 'any_name'
 
 function makeFakeLoginData (): AuthenticationParams {
   return {
@@ -56,36 +58,17 @@ function makeFakeLoginData (): AuthenticationParams {
 }
 
 async function insertFakeAccount (): Promise<AccountModel> {
-  const { ops: [account] } = await accountCollection.insertOne(await makeFakeAccountData())
+  const { ops: [account] } = await accountCollection.insertOne(
+    {
+      ...mockAddAccountParams(),
+      password: await hashPassword(mockAddAccountParams().password)
+    }
+  )
   return MongoHelper.formatId(account)
-}
-
-async function makeFakeAccountData (): Promise<AddAccountParams> {
-  return {
-    name: ANY_NAME,
-    email: ANY_EMAIL,
-    password: await hashPassword(ANY_PASSWORD)
-  }
 }
 
 async function hashPassword (password: string): Promise<string> {
   const salt = 12
   const hashedPassword = await hash(ANY_PASSWORD, salt)
   return hashedPassword
-}
-
-interface NewAccount {
-  name: string
-  email: string
-  password: string
-  passwordConfirmation: string
-}
-
-function makeFakeNewAccountData (): NewAccount {
-  return {
-    name: ANY_NAME,
-    email: ANY_EMAIL,
-    password: ANY_PASSWORD,
-    passwordConfirmation: ANY_PASSWORD
-  }
 }

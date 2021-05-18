@@ -1,4 +1,5 @@
 import { AccountModel } from '@/domain/models/account'
+import { mockAddAccountParams } from '@/domain/test'
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper'
 import { sign } from 'jsonwebtoken'
 import { Collection } from 'mongodb'
@@ -29,9 +30,7 @@ describe('Survey Routes', () => {
         .expect(403)
     })
     test('should return 204 on add survey with accessToken', async () => {
-      const accountData = makeFakeAccountData()
-      accountData.role = 'admin'
-      const account = await insertFakeAccount(accountData)
+      const account = await insertFakeAccount({ ...mockAddAccountParams(), role: 'admin' })
       const accessToken = makeAccessToken(account.id)
       await updateAccountAccessToken(account.id, accessToken)
       await request(app)
@@ -48,7 +47,7 @@ describe('Survey Routes', () => {
         .expect(403)
     })
     test('should return 204 on load empty surveys list with valid accessToken', async () => {
-      const account = await insertFakeAccount(makeFakeAccountData())
+      const account = await insertFakeAccount(mockAddAccountParams())
       const accessToken = sign({ id: account.id }, env.jwtSecretKey)
       await updateAccountAccessToken(account.id, accessToken)
       await request(app)
@@ -57,7 +56,7 @@ describe('Survey Routes', () => {
         .expect(204)
     })
     test('should return 200 on load surveys with valid accessToken', async () => {
-      const account = await insertFakeAccount(makeFakeAccountData())
+      const account = await insertFakeAccount(mockAddAccountParams())
       const accessToken = makeAccessToken(account.id)
       await updateAccountAccessToken(account.id, accessToken)
       await insertFakeSurveys()
@@ -91,14 +90,6 @@ async function insertFakeSurveys (): Promise<void> {
     makeFakeSurveyData(),
     makeFakeSurveyData()
   ])
-}
-
-function makeFakeAccountData (): any {
-  return {
-    name: 'any_name',
-    email: 'any_email@mail.com',
-    password: 'hashed_password'
-  }
 }
 
 function makeFakeSurveyData (): any {

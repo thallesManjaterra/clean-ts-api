@@ -1,6 +1,8 @@
-import { SaveSurveyResultParams, SaveSurveyResultRepository, SurveyResultModel } from './db-save-survey-result-protocols'
+import { SaveSurveyResultRepository } from './db-save-survey-result-protocols'
 import { DbSaveSurveyResult } from './db-save-survey-result'
 import mockDate from 'mockdate'
+import { mockSaveSurveyResultRepository } from '@/data/test'
+import { mockSurveyResultData, mockSurveyResultModel } from '@/domain/test'
 
 describe('DbSaveSurveyResult Usecase', () => {
   beforeAll(() => {
@@ -12,7 +14,7 @@ describe('DbSaveSurveyResult Usecase', () => {
   test('should call SaveSurveyResultRepository with correct values', async () => {
     const { sut, saveSurveyResultRepositoryStub } = makeSut()
     const saveSpy = jest.spyOn(saveSurveyResultRepositoryStub, 'save')
-    const surveyResultData = makeFakeSurveyResultData()
+    const surveyResultData = mockSurveyResultData()
     await sut.save(surveyResultData)
     expect(saveSpy).toHaveBeenCalledWith(surveyResultData)
   })
@@ -23,8 +25,8 @@ describe('DbSaveSurveyResult Usecase', () => {
   })
   test('should return a survey result on success', async () => {
     const { sut } = makeSut()
-    const surveyResult = await sut.save(makeFakeSurveyResultData())
-    expect(surveyResult).toEqual(makeFakeSurveyResult())
+    const surveyResult = await sut.save(mockSurveyResultData())
+    expect(surveyResult).toEqual(mockSurveyResultModel())
   })
 })
 
@@ -34,32 +36,7 @@ interface SutTypes {
 }
 
 function makeSut (): SutTypes {
-  const saveSurveyResultRepositoryStub = makeSaveSurveyResultRepository()
+  const saveSurveyResultRepositoryStub = mockSaveSurveyResultRepository()
   const sut = new DbSaveSurveyResult(saveSurveyResultRepositoryStub)
   return { sut, saveSurveyResultRepositoryStub }
-}
-
-function makeSaveSurveyResultRepository (): SaveSurveyResultRepository {
-  class SaveSurveyResultRepositoryStub implements SaveSurveyResultRepository {
-    async save (surveyResultData: SaveSurveyResultParams): Promise<SurveyResultModel> {
-      return await Promise.resolve(makeFakeSurveyResult())
-    }
-  }
-  return new SaveSurveyResultRepositoryStub()
-}
-
-function makeFakeSurveyResultData (): SaveSurveyResultParams {
-  return {
-    surveyId: 'any_survey_id',
-    accountId: 'any_account_id',
-    answer: 'any_answer',
-    date: new Date()
-  }
-}
-
-function makeFakeSurveyResult (): SurveyResultModel {
-  return {
-    id: 'any_id',
-    ...makeFakeSurveyResultData()
-  }
 }

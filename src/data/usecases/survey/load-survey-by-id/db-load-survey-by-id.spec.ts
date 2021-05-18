@@ -1,6 +1,8 @@
+import { mockLoadSurveyByIdRepository } from '@/data/test'
+import { mockSurveyModel } from '@/domain/test'
 import mockDate from 'mockdate'
 import { DbLoadSurveyById } from './db-load-survey-by-id'
-import { LoadSurveyByIdRepository, SurveyModel } from './db-load-survey-by-id-protocols'
+import { LoadSurveyByIdRepository } from './db-load-survey-by-id-protocols'
 
 describe('DbLoadSurveys Usecase', () => {
   beforeAll(() => {
@@ -12,13 +14,13 @@ describe('DbLoadSurveys Usecase', () => {
   test('should call LoadSurveyByIdRepository with correct id', async () => {
     const { sut, loadSurveyByIdRepositoryStub } = makeSut()
     const loadByIdSpy = jest.spyOn(loadSurveyByIdRepositoryStub, 'loadById')
-    const fakeSurvey = makeFakeSurvey()
+    const fakeSurvey = mockSurveyModel()
     await sut.loadById(fakeSurvey.id)
     expect(loadByIdSpy).toHaveBeenCalledWith(fakeSurvey.id)
   })
   test('should return a survey on success', async () => {
     const { sut } = makeSut()
-    const fakeSurvey = makeFakeSurvey()
+    const fakeSurvey = mockSurveyModel()
     const survey = await sut.loadById(fakeSurvey.id)
     expect(survey).toEqual(fakeSurvey)
   })
@@ -35,28 +37,7 @@ interface SutTypes {
 }
 
 function makeSut (): SutTypes {
-  const loadSurveyByIdRepositoryStub = makeLoadSurveyByIdRepository()
+  const loadSurveyByIdRepositoryStub = mockLoadSurveyByIdRepository()
   const sut = new DbLoadSurveyById(loadSurveyByIdRepositoryStub)
   return { sut, loadSurveyByIdRepositoryStub }
-}
-
-function makeLoadSurveyByIdRepository (): LoadSurveyByIdRepository {
-  class LoadSurveyByIdRepositoryStub implements LoadSurveyByIdRepository {
-    async loadById (id: string): Promise<SurveyModel> {
-      return await Promise.resolve(makeFakeSurvey())
-    }
-  }
-  return new LoadSurveyByIdRepositoryStub()
-}
-
-function makeFakeSurvey (): SurveyModel {
-  return {
-    id: 'any_id',
-    question: 'any_question',
-    answers: [{
-      image: 'any_image',
-      answer: 'any_answer'
-    }],
-    date: new Date()
-  }
 }
